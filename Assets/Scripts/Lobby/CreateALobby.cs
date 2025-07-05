@@ -1,5 +1,9 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using JetBrains.Annotations;
 using TMPro;
+using Unity.Services.Authentication;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -9,27 +13,37 @@ public class CreateALobby : MonoBehaviour
     public TMP_InputField LobbyName;
     public TMP_Dropdown teamSize;
     public TMP_InputField lobbyPassword;
+    public static bool checkPassword;
 
     public async void CreateLobbyMethod()
     {
         string lobbyName = LobbyName.text;
         int maxPlayers = Convert.ToInt32(teamSize.options[teamSize.value].text);
         CreateLobbyOptions options = new CreateLobbyOptions();
-        //options.Password = lobbyPassword.text;
+        options.Data = new Dictionary<string, DataObject>()
+        {
+            {"password", new DataObject(
+                DataObject.VisibilityOptions.Member,
+                value: lobbyPassword.text)}
+        };
+        //options.Player = new Player(AuthenticationService.Instance.PlayerId);
 
         Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
         DontDestroyOnLoad(this);
         Debug.Log("Lobby created");
-    }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
+        checkPassword = JoinLobby.CheckPassword(lobby, JoinLobby.password.text);
+
+        StartCoroutine(HearthBeatLobbyCorootine(lobby.Id, 15f));
     }
 
-    // Update is called once per frame
-    void Update()
+    IEnumerator HearthBeatLobbyCorootine(string lobbyID, float waitTimeSeconds)
     {
-        
+        var delay = new WaitForSeconds(waitTimeSeconds);
+
+        while (true)
+        {
+            LobbyService.Instance.SendHeartbeatPingAsync(lobbyID);
+            yield return delay;
+        }
     }
 }
