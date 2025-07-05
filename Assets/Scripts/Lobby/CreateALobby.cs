@@ -13,6 +13,7 @@ public class CreateALobby : MonoBehaviour
     public TMP_InputField LobbyName;
     public TMP_Dropdown teamSize;
     public TMP_InputField lobbyPassword;
+    public TMP_InputField password;
     public static bool checkPassword;
 
     public async void CreateLobbyMethod()
@@ -31,7 +32,7 @@ public class CreateALobby : MonoBehaviour
         Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
         DontDestroyOnLoad(this);
         Debug.Log("Lobby created");
-        checkPassword = JoinLobby.CheckPassword(lobby, JoinLobby.password.text);
+        checkPassword = JoinLobby.CheckPassword(lobby, password.text);
 
         StartCoroutine(HearthBeatLobbyCorootine(lobby.Id, 15f));
     }

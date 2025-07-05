@@ -6,7 +6,7 @@ using UnityEngine;
 public class JoinLobby : MonoBehaviour
 {
     public TMP_InputField lobbyCode;
-    public static TMP_InputField password;
+    public TMP_InputField password;
 
     public static bool CheckPassword(Lobby lobby, string password)
     {
