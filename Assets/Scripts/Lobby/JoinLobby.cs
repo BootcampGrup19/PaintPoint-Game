@@ -2,6 +2,7 @@ using TMPro;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class JoinLobby : MonoBehaviour
 {
@@ -25,15 +26,18 @@ public class JoinLobby : MonoBehaviour
         return true;
     }
 
-    public async void JoinLobbyWithLobbyCode(string lobbycode)
+    public async void JoinLobbyWithLobbyCode()
     {
         var code = lobbyCode.text;
         try
         {
             if (CreateALobby.checkPassword)
             {
-                await LobbyService.Instance.JoinLobbyByCodeAsync(code);
+                Lobby lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code);
+                DontDestroyOnLoad(this);
+                GetComponent<CurrentLobby>().currentLobby = lobby;
                 Debug.Log("Joined lobby with code: " + code);
+                SceneManager.LoadScene("LobbyRoom");
             }
         }
         catch (LobbyServiceException e)
@@ -59,8 +63,11 @@ public class JoinLobby : MonoBehaviour
                 }
             }
 
-            await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
+            Lobby lobby1 = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
+            DontDestroyOnLoad(this);
+            GetComponent<CurrentLobby>().currentLobby = lobby1;
             Debug.Log("Joined lobby with id: " + lobbyId);
+            SceneManager.LoadScene("LobbyRoom");
         }
         catch (LobbyServiceException e)
         {
@@ -73,8 +80,11 @@ public class JoinLobby : MonoBehaviour
         try
         {
             Lobby lobby = await LobbyService.Instance.QuickJoinLobbyAsync();
+            DontDestroyOnLoad(this);
+            GetComponent<CurrentLobby>().currentLobby = lobby;
             Debug.Log("Joined lobby with Quick Join: " + lobby.Id);
             Debug.Log("lobby code: " + lobby.LobbyCode);
+            SceneManager.LoadScene("LobbyRoom");
         }
         catch (LobbyServiceException e)
         {

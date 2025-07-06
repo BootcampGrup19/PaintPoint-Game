@@ -7,6 +7,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CreateALobby : MonoBehaviour
 {
@@ -27,14 +28,16 @@ public class CreateALobby : MonoBehaviour
                 DataObject.VisibilityOptions.Member,
                 value: lobbyPassword.text)}
         };
-        //options.Player = new Player(AuthenticationService.Instance.PlayerId);
+        options.Player = new Player(AuthenticationService.Instance.PlayerId);
 
         Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
         DontDestroyOnLoad(this);
+        GetComponent<CurrentLobby>().currentLobby = lobby;
         Debug.Log("Lobby created");
         checkPassword = JoinLobby.CheckPassword(lobby, password.text);
 
         StartCoroutine(HearthBeatLobbyCorootine(lobby.Id, 15f));
+        SceneManager.LoadScene("LobbyRoom");
     }
 
     IEnumerator HearthBeatLobbyCorootine(string lobbyID, float waitTimeSeconds)
