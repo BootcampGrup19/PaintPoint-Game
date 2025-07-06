@@ -9,36 +9,22 @@ public class JoinLobby : MonoBehaviour
     public TMP_InputField lobbyCode;
     public TMP_InputField password;
 
-    public static bool CheckPassword(Lobby lobby, string password)
-    {
-        var enteredPassword = password;
-        if (lobby.Data.TryGetValue("password", out var passwordData))
-        {
-            string actualPassword = passwordData.Value;
-
-            if (!string.IsNullOrEmpty(actualPassword))
-            {
-                return enteredPassword == actualPassword;
-            }
-        }
-
-        // Şifre yoksa herkes girebilir
-        return true;
-    }
-
     public async void JoinLobbyWithLobbyCode()
     {
         var code = lobbyCode.text;
+        var enteredPassword = password.text;
         try
         {
-            if (CreateALobby.checkPassword)
-            {
-                Lobby lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code);
-                DontDestroyOnLoad(this);
-                GetComponent<CurrentLobby>().currentLobby = lobby;
-                Debug.Log("Joined lobby with code: " + code);
-                SceneManager.LoadScene("LobbyRoom");
-            }
+            JoinLobbyByCodeOptions options = new JoinLobbyByCodeOptions();
+            options.Password = enteredPassword;
+
+            Lobby lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, options);
+
+            DontDestroyOnLoad(this);
+            GetComponent<CurrentLobby>().currentLobby = lobby;
+
+            Debug.Log("Joined lobby with code: " + code);
+            SceneManager.LoadScene("LobbyRoom");
         }
         catch (LobbyServiceException e)
         {
@@ -51,23 +37,17 @@ public class JoinLobby : MonoBehaviour
         var enteredPassword = password.text;
         try
         {
-            var lobby = await LobbyService.Instance.GetLobbyAsync(lobbyId);
-            if (lobby.Data.TryGetValue("password", out var passwordData))
-            {
-                string realPassword = passwordData.Value;
+            JoinLobbyByIdOptions options = new JoinLobbyByIdOptions();
+            options.Password = enteredPassword;
 
-                if (enteredPassword != realPassword)
-                {
-                    Debug.LogWarning("Wrong Password!");
-                    return;
-                }
-            }
+            Lobby lobby1 = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId, options);
 
-            Lobby lobby1 = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
             DontDestroyOnLoad(this);
             GetComponent<CurrentLobby>().currentLobby = lobby1;
+
             Debug.Log("Joined lobby with id: " + lobbyId);
             SceneManager.LoadScene("LobbyRoom");
+
         }
         catch (LobbyServiceException e)
         {

@@ -67,10 +67,13 @@ public class GetLobbies : MonoBehaviour
     private void CreateLobbyButton(Lobby lobby)
     {
         var button = Instantiate(buttonPrefab, Vector3.zero, Quaternion.identity);
+
         button.name = lobby.Name;
         button.GetComponentInChildren<TextMeshProUGUI>().text = lobby.Name;
+
         var recttransform = button.GetComponent<RectTransform>();
         recttransform.SetParent(buttonContainers.transform);
+        
         button.GetComponent<Button>().onClick.AddListener(delegate () { Lobby_OnClick(lobby); });
     }
     public void Lobby_OnClick(Lobby lobby)

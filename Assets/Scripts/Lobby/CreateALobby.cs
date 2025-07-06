@@ -15,7 +15,6 @@ public class CreateALobby : MonoBehaviour
     public TMP_Dropdown teamSize;
     public TMP_InputField lobbyPassword;
     public TMP_InputField password;
-    public static bool checkPassword;
 
     public async void CreateLobbyMethod()
     {
@@ -34,7 +33,6 @@ public class CreateALobby : MonoBehaviour
         DontDestroyOnLoad(this);
         GetComponent<CurrentLobby>().currentLobby = lobby;
         Debug.Log("Lobby created");
-        checkPassword = JoinLobby.CheckPassword(lobby, password.text);
 
         StartCoroutine(HearthBeatLobbyCorootine(lobby.Id, 15f));
         SceneManager.LoadScene("LobbyRoom");
