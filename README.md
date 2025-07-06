@@ -23,5 +23,20 @@ PaintPoint, çok oyunculu ve takım tabanlı, stratejik ve rekabetçi öğeler b
 * Sprint Puan Mantığı: Fibonacci sayı dizisi ile zorluğuna göre puanlanmış toplam 100 puan değerindeki görevler 3 sprinte bölünmüştür.
 * Sprint içinde tamamlamlanması hedeflenen puan: 28
 * Sprint içinde ulaşılan puan: 18
-* Daily Scrum: Daily scrum whatsapp üzerinden bugün ne yaptığım + yarın ne yapacağım şeklinde yazılarak yapılmıştır. Görseller Miro Board üzerinden paylaşılmıştır.
-* Sprint Board Update
+* Daily Scrum [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/DailyScrum%20(2).png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/DailyScrum%20(1).png)
+* Sprint Board Update [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/SprintBoard.png) 
+* Oyun Hakkında Gelişmeler [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress.png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress%20(2).png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress%20(3).png)
+* Sprint Review
+  * Bu sprintte oyun fikri oluşturuldu, oyunun detaylı bir tanımı yapıldı ve görev dağılımları yapıldı.
+  * Bu sprintte hedeflenen puanın 10 puan altında kalındı.
+  * Takımda herkes üzerine düşeni yaptı ancak oyunun geliştirme süreci daha çok ikinci sprinte kaldı, takımdaki çoğu kişi planını bu yönde yaptı.
+  * Bu sprintte daha çok takım kalan işlerini ve eğitimleri bitirdi.
+* Sprint Retrospecitve
+  * İletişim ve fikir birliği güçlüydü.
+  * Görev dağılımı etkili ve katılımcı şekilde yapıldı.
+  * Eğitim süreci başarıyla tamamlandı.
+  * Teknik işler sonraya ertelendi, sprint dengesiz kaldı.
+  * Görev puanlaması gerçeği tam yansıtmadı.
+  * Bir sonraki sprintte teknik görevler erkenden başlamalı.
+  * Puanlama daha dikkatli ve tahmin odaklı yapılmalı.
+  * Günlük kısa kontrollerle ilerleme takip edilmeli.
