@@ -1,8 +1,10 @@
+using System;
 using TMPro;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using WebSocketSharp;
 
 public class JoinLobby : MonoBehaviour
 {
@@ -16,7 +18,11 @@ public class JoinLobby : MonoBehaviour
         try
         {
             JoinLobbyByCodeOptions options = new JoinLobbyByCodeOptions();
-            options.Password = enteredPassword;
+
+            if (!string.IsNullOrEmpty(enteredPassword))
+            {
+                options.Password = enteredPassword;
+            }
 
             Lobby lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, options);
 
@@ -38,7 +44,11 @@ public class JoinLobby : MonoBehaviour
         try
         {
             JoinLobbyByIdOptions options = new JoinLobbyByIdOptions();
-            options.Password = enteredPassword;
+
+            if(!string.IsNullOrEmpty(enteredPassword))
+            {
+                options.Password = enteredPassword;
+            }
 
             Lobby lobby1 = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId, options);
 

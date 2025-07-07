@@ -7,10 +7,11 @@ using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class GetLobbies : MonoBehaviour
 {
-    public GameObject buttonPrefab;
-    public GameObject buttonContainers;
+    public GameObject lobbyRowPrefab;
+    public GameObject rowContainer;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     async void Start()
     {
@@ -50,12 +51,13 @@ public class GetLobbies : MonoBehaviour
 
             QueryResponse lobbies = await LobbyService.Instance.QueryLobbiesAsync(options);
             Debug.LogWarning("Get Lobbies Done! Count::" + lobbies.Results.Count);
+
             foreach (Lobby bulunanLobby in lobbies.Results)
             {
                 Debug.Log("Lobby Name: " + bulunanLobby.Name + "\n" +
                 "Time for Created Lobby: " + bulunanLobby.Created + "\n" +
                 "Lobby Code: " + bulunanLobby.LobbyCode);
-                CreateLobbyButton(bulunanLobby);
+                CreateLobbyRow(bulunanLobby);
             }
         }
         catch (LobbyServiceException e)
@@ -64,17 +66,20 @@ public class GetLobbies : MonoBehaviour
             Debug.Log(e);
         }
     }
-    private void CreateLobbyButton(Lobby lobby)
+    private void CreateLobbyRow(Lobby lobby)
     {
-        var button = Instantiate(buttonPrefab, Vector3.zero, Quaternion.identity);
+        GameObject row = Instantiate(lobbyRowPrefab, rowContainer.transform);
+        row.name = lobby.Name;
 
-        button.name = lobby.Name;
-        button.GetComponentInChildren<TextMeshProUGUI>().text = lobby.Name;
+        row.transform.Find("LobbyNameText").GetComponent<TextMeshProUGUI>().text = lobby.Name;
+        row.transform.Find("OwnerText").GetComponent<TextMeshProUGUI>().text = lobby.HostId;
+        row.transform.Find("PlayerCountText").GetComponent<TextMeshProUGUI>().text = lobby.Players.Count + "/" + lobby.MaxPlayers;
 
-        var recttransform = button.GetComponent<RectTransform>();
-        recttransform.SetParent(buttonContainers.transform);
+        var rectTransform = row.GetComponent<RectTransform>();
+        rectTransform.SetParent(rowContainer.transform);
         
-        button.GetComponent<Button>().onClick.AddListener(delegate () { Lobby_OnClick(lobby); });
+        Button joinButton = row.transform.Find("JoinButton").GetComponent<Button>();
+        joinButton.onClick.AddListener(() => Lobby_OnClick(lobby));
     }
     public void Lobby_OnClick(Lobby lobby)
     {
@@ -83,9 +88,9 @@ public class GetLobbies : MonoBehaviour
     }
     private void ClearContainer()
     {
-        if (buttonContainers is not null && buttonContainers.transform.childCount > 0)
+        if (rowContainer is not null && rowContainer.transform.childCount > 0)
         {
-            foreach (Transform variable in buttonContainers.transform)
+            foreach (Transform variable in rowContainer.transform)
             {
                 Destroy(variable.gameObject);
             }
