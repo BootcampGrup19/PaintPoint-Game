@@ -20,9 +20,17 @@ PaintPoint, çok oyunculu ve takım tabanlı, stratejik ve rekabetçi öğeler b
 ## Backlog, Daily Scrum, User Story ve Sprint Board URL:  
 [Miro Board](https://miro.com/app/board/uXjVIluS4aA=/)
 ## Sprint 1
-* Sprint Puan Mantığı: Fibonacci sayı dizisi ile zorluğuna göre puanlanmış toplam 100 puan değerindeki görevler 3 sprinte bölünmüştür.
+* Sprint Notları
+  * Sprint 1, projenin temellerinin atıldığı hazırlık sprinti olarak planlandı.
+  * Oyun fikri ekip kararıyla netleştirildi ve temel konsept (alan boyama FPS) belirlendi.
+  * Görevler, teknik ve tasarımsal alanlara ayrılarak üç sprint boyunca eşit dağılacak şekilde puanlandı.
+  * Takım üyeleri arasındaki rol dağılımı (Scrum Master, görev sorumluları vb.) sprint başında yapıldı.
+  * Bu sprintte teknik uygulamadan çok planlama, araştırma ve araçlara alışma ön plandaydı.
+  * Eğitim materyalleri gözden geçirildi, Unity ve Git süreçlerine alışmak için deneme ortamları kuruldu.
+  * Proje yönetim araçları ve iletişim kanalları belirlendi.
 * Sprint içinde tamamlamlanması hedeflenen puan: 28
 * Sprint içinde ulaşılan puan: 18
+* Sprint Puan Mantığı: Fibonacci sayı dizisi ile zorluğuna göre puanlanmış toplam 100 puan değerindeki görevler 3 sprinte bölünmüştür.
 * Daily Scrum [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/DailyScrum%20(2).png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/DailyScrum%20(1).png)
 * Sprint Board Update [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/SprintBoard.png) 
 * Oyun Hakkında Gelişmeler [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress.png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress%20(2).png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress%20(3).png)
