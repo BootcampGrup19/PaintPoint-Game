@@ -97,3 +97,14 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# scrum image'larin takip edilmemesi icin
+Assets/Images/ScrumImages.meta
+Assets/Images/ScrumImages/DailyScrum (1).png.meta
+Assets/Images/ScrumImages/DailyScrum (2).png.meta
+Assets/Images/ScrumImages/GameProgress (2).png.meta
+Assets/Images/ScrumImages/GameProgress (3).png.meta
+Assets/Images/ScrumImages/GameProgress.png.meta
+Assets/Images/ScrumImages/SprintBoard.png.meta
+Assets/Images/ScrumImages/Sprints.png.meta
+Assets/Images/Sprints.png.meta
