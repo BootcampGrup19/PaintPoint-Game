@@ -19,6 +19,7 @@ PaintPoint, çok oyunculu ve takım tabanlı, stratejik ve rekabetçi öğeler b
 4. Silah ve power up çeşitliliği ile farklı stratejilerin geliştirilebileceği bir oynanış
 ## Backlog, Daily Scrum, User Story ve Sprint Board URL:  
 [Miro Board](https://miro.com/app/board/uXjVIluS4aA=/)
+# Sprint Kayıtları
 ## Sprint 1
 * Sprint Notları
   * Sprint 1, projenin temellerinin atıldığı hazırlık sprinti olarak planlandı.
