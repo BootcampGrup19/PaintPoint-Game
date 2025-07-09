@@ -118,7 +118,7 @@ public class PopulateUI : MonoBehaviour
             {
                 var text = Instantiate(playerInfoPrefab, Vector3.zero, Quaternion.identity);
                 text.name = player.Joined.ToShortTimeString();
-                text.GetComponent<TextMeshProUGUI>().text = player.Id;
+                text.GetComponentInChildren<TextMeshProUGUI>().text = player.Id;
                 var rectTransform = text.GetComponent<RectTransform>();
                 rectTransform.SetParent(redTeamContainer.transform);
             }
@@ -136,7 +136,7 @@ public class PopulateUI : MonoBehaviour
             {
                 var text = Instantiate(playerInfoPrefab, Vector3.zero, Quaternion.identity);
                 text.name = player.Joined.ToShortTimeString();
-                text.GetComponent<TextMeshProUGUI>().text = player.Id;
+                text.GetComponentInChildren<TextMeshProUGUI>().text = player.Id;
                 var rectTransform = text.GetComponent<RectTransform>();
                 rectTransform.SetParent(blueTeamContainer.transform);
             }
@@ -154,7 +154,7 @@ public class PopulateUI : MonoBehaviour
             {
                 var text = Instantiate(playerInfoPrefab, Vector3.zero, Quaternion.identity);
                 text.name = player.Joined.ToShortTimeString();
-                text.GetComponent<TextMeshProUGUI>().text = player.Id;
+                text.GetComponentInChildren<TextMeshProUGUI>().text = player.Id;
                 var rectTransform = text.GetComponent<RectTransform>();
                 rectTransform.SetParent(playerInfoContainer.transform);
             }
@@ -182,9 +182,9 @@ public class PopulateUI : MonoBehaviour
         var text = Instantiate(playerInfoPrefab, Vector3.zero, Quaternion.identity);
 
         text.name = player.Joined.ToShortTimeString();
-        text.GetComponent<TextMeshProUGUI>().text = player.Id;
-        
+        text.GetComponentInChildren<TextMeshProUGUI>().text = player.Id;
+
         var rectTransform = text.GetComponent<RectTransform>();
         rectTransform.SetParent(container.transform);
-    }
+    }   
 }
