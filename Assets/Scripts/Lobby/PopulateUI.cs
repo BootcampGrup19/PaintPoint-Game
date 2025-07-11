@@ -8,6 +8,12 @@ using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using System.Threading.Tasks;
+using System;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 
 public class PopulateUI : MonoBehaviour
 {
@@ -23,12 +29,14 @@ public class PopulateUI : MonoBehaviour
     public Button startReadyButton;
     public TextMeshProUGUI startReadyButtonText;
     private bool isReady = false;
+    private RelayHostData _hostData;
+    bool _relayJoined = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         _currentLobby = GameObject.Find("LobbyManager").GetComponent<CurrentLobby>();
         lobbyId = _currentLobby.currentLobby.Id;
-        InvokeRepeating(nameof(PollForLobbyUpdate), 1.1f, 0.5f);
+        InvokeRepeating(nameof(PollForLobbyUpdate), 1.1f, 2f);
         UpdateStartReadyButtonUI();
         PopulateUIElements();
     }
@@ -89,6 +97,25 @@ public class PopulateUI : MonoBehaviour
     {
         _currentLobby.currentLobby = await LobbyService.Instance.GetLobbyAsync(lobbyId);
         PopulateUIElements();
+
+        if (!_relayJoined && _currentLobby.currentLobby.Data.TryGetValue("relayJoinCode", out var codeObj))
+        {
+            string joinCode = codeObj.Value;
+            await JoinRelayAndStartClientAsync(joinCode);
+            _relayJoined = true; // Tek seferlik
+        }
+    }
+    async Task JoinRelayAndStartClientAsync(string joinCode)
+    {
+        var alloc = await RelayService.Instance.JoinAllocationAsync(joinCode);
+
+        var utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        utp.SetRelayServerData(alloc.RelayServer.IpV4, (ushort)alloc.RelayServer.Port,
+                               alloc.AllocationIdBytes, alloc.Key,
+                               alloc.ConnectionData, alloc.HostConnectionData);
+
+        NetworkManager.Singleton.StartClient();      // Host sahneyi çoktan yüklemiş olsa bile,
+        // Netcode SceneManager client'ı o sahneye otomatik senkronize eder.
     }
     // private void ClearContainer()
     // {
@@ -232,7 +259,7 @@ public class PopulateUI : MonoBehaviour
 
         bool allReady = _currentLobby.currentLobby.Players
             .Where(p => p.Id != AuthenticationService.Instance.PlayerId)
-            .All(p => p.Data.ContainsKey("ready") && p.Data["ready"].Value == "true");
+            .All(p => p.Data != null && p.Data.ContainsKey("ready") && p.Data["ready"].Value == "true");
 
         startReadyButton.interactable = allReady;
     }
@@ -258,14 +285,36 @@ public class PopulateUI : MonoBehaviour
             options
         );
     }
-    public void OnStartButtonClicked()
+    public async void OnStartButtonClicked()
     {
-        if (!IsHost()) return;
+        if (!IsHost())
+        {
+            Debug.Log(IsHost());
+            return;
+        }
+        startReadyButton.interactable = false;
+
+        int maxConnections = Convert.ToInt32(_currentLobby.currentLobby.Data["maxplayers"].Value); 
+        await CreateRelayAndStartHostAsync(maxConnections);
+
+        await LobbyService.Instance.UpdateLobbyAsync(lobbyId, new UpdateLobbyOptions
+        {
+            Data = new Dictionary<string, DataObject>
+            {
+                ["relayJoinCode"] = new DataObject(DataObject.VisibilityOptions.Public, _hostData.joinCode),
+                ["startTime"] = new DataObject(DataObject.VisibilityOptions.Public,
+                                                DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString())
+            }
+        });
+
+        Debug.Log("Start Button Clicked");
+
         StartCoroutine(StartCountdown());
     }
 
     IEnumerator StartCountdown()
     {
+        Debug.Log("Countdown started.");
         int countdown = 3;
         while (countdown > 0)
         {
@@ -274,8 +323,44 @@ public class PopulateUI : MonoBehaviour
             countdown--;
         }
 
+        Debug.Log("Countdown finished. Loading scene...");
+
         startReadyButtonText.text = "Starting...";
         yield return new WaitForSeconds(0.5f); // opsiyonel
-        SceneManager.LoadScene("MultiplayerScene");
+
+        NetworkManager.Singleton.SceneManager.LoadScene(
+        "MultiplayerScene",
+        UnityEngine.SceneManagement.LoadSceneMode.Single);
+    }
+    async Task CreateRelayAndStartHostAsync(int maxConnections)
+    {
+        Debug.Log("Creating Relay Allocation...");
+        Allocation alloc = await RelayService.Instance.CreateAllocationAsync(maxConnections);
+        Debug.Log("Relay Allocation Created.");
+
+        _hostData = new RelayHostData()
+        {
+            IPv4Address = alloc.RelayServer.IpV4,
+            port = (ushort)alloc.RelayServer.Port,
+            AllocationID = alloc.AllocationId,
+            AllocationIDBytes = alloc.AllocationIdBytes,
+            ConnectionData = alloc.ConnectionData,
+            key = alloc.Key,
+            joinCode = await RelayService.Instance.GetJoinCodeAsync(alloc.AllocationId)
+        };
+
+        Debug.Log($"Join code: {_hostData.joinCode}");
+
+        var utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        utp.SetRelayServerData(
+            _hostData.IPv4Address,
+            _hostData.port,
+            _hostData.AllocationIDBytes,
+            _hostData.key,
+            _hostData.ConnectionData);
+
+        Debug.Log("Starting Host...");
+        NetworkManager.Singleton.StartHost();
+        Debug.Log("Host started.");
     }
 }

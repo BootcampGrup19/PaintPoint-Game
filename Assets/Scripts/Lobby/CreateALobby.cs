@@ -25,7 +25,10 @@ public class CreateALobby : MonoBehaviour
         {
             {"password", new DataObject(
                 DataObject.VisibilityOptions.Member,
-                value: lobbyPassword.text)}
+                value: lobbyPassword.text)},
+            {"maxplayers",
+                new DataObject(DataObject.VisibilityOptions.Private,
+                value: Convert.ToString(maxPlayers))}
         };
         options.Player = new Player(AuthenticationService.Instance.PlayerId);
 
