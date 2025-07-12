@@ -10,38 +10,44 @@ using Unity.Services.Relay;
 using NUnit.Framework.Constraints;
 using Unity.Netcode.Transports.UTP;
 using Unity.Netcode;
+using UnityEngine.SceneManagement;
 
 public class RelayManager : MonoBehaviour
 {
-    private string playerID;
     private RelayHostData _hostData;
     private RelayJoinData _joinData;
-    public TextMeshProUGUI idText;
-    public TextMeshProUGUI joinCodeText;
-    public TextMeshProUGUI text;
-    public TMP_InputField inputField;
-    public TMP_Dropdown playerCount;
+    [SerializeField] public TextMeshProUGUI joinCodeText;
+    [SerializeField] public TextMeshProUGUI text;
+    [SerializeField] public TextMeshProUGUI playerIDText;
+
+    public static RelayManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     async void Start()
     {
         await UnityServices.InitializeAsync();
         Debug.Log("Unity Services Init");
-        SignIn();
+        // SignIn();
+        SafeSetText(playerIDText, "PlayerID: " + AuthenticationService.Instance.PlayerId);
     }
 
-    async void SignIn()
+    // async void SignIn() 
+    // {
+    //     Debug.Log("Signing In");
+    //     await AuthenticationService.Instance.SignInAnonymouslyAsync();
+    //     playerID = AuthenticationService.Instance.PlayerId;
+    //     Debug.Log("Signed In");
+    //     idText.text = "Player Id: " + playerID;
+    // }
+    public async Task<string> StartRelayHostAsync(int maxPlayers)
     {
-        Debug.Log("Signing In");
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
-        playerID = AuthenticationService.Instance.PlayerId;
-        Debug.Log("Signed In");
-        idText.text = "Player Id: " + playerID;
-    }
-    public async void OnHostClick()
-    {
-        int maxPlayerCount = Convert.ToInt32(playerCount.options[playerCount.value].text);
-
-        Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayerCount);
+        Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayers);
         _hostData = new RelayHostData()
         {
             IPv4Address = allocation.RelayServer.IpV4,
@@ -55,16 +61,19 @@ public class RelayManager : MonoBehaviour
         _hostData.joinCode = await RelayService.Instance.GetJoinCodeAsync(_hostData.AllocationID);
         Debug.Log("Allocation Complete: " + _hostData.AllocationID);
         Debug.LogWarning("Join Code: " + _hostData.joinCode);
-        joinCodeText.text = _hostData.joinCode;
 
         UnityTransport transport = NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>();
         transport.SetRelayServerData(_hostData.IPv4Address, _hostData.port, _hostData.AllocationIDBytes, _hostData.key, _hostData.ConnectionData);
-        NetworkManager.Singleton.StartHost();
+        
         InitMovementText();
+
+        SafeSetText(joinCodeText, "Join Code: " + _hostData.joinCode);
+        return _hostData.joinCode;
+
     }
-    public async void OnJoinClick()
+    public async Task JoinRelayAsync(string joinCode)
     {
-        JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(inputField.text);
+        JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
 
         _joinData = new RelayJoinData()
         {
@@ -78,7 +87,7 @@ public class RelayManager : MonoBehaviour
             key = allocation.Key
         };
         Debug.Log("Join Succes :" + _joinData.AllocationID);
-        joinCodeText.text = _hostData.joinCode;
+        SafeSetText(joinCodeText, "Join Code: " + _hostData.joinCode);
 
         UnityTransport transport = NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>();
         transport.SetRelayServerData(_joinData.IPv4Address, _joinData.port, _joinData.AllocationIDBytes, _joinData.key, _joinData.ConnectionData, _joinData.HostConnectionData);
@@ -87,13 +96,48 @@ public class RelayManager : MonoBehaviour
     }
     private void InitMovementText()
     {
-        if(NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost)
+        if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost)
         {
-            text.text = "Move";
+            SafeSetText(text, "Move");
         }
-        else if(NetworkManager.Singleton.IsClient)
+        else if (NetworkManager.Singleton.IsClient)
         {
-            text.text = "Request Move";
+            SafeSetText(text, "Request Move");
+        }
+    }
+    void SafeSetText(TextMeshProUGUI t, string v)
+    {
+        if (t != null) t.text = v;
+    }
+    public void StopRelay()
+    {
+        if (NetworkManager.Singleton.IsHost || NetworkManager.Singleton.IsClient)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+    }
+    public async Task<string> RestartRelayHostAsync(int maxPlayers)
+    {
+        StopRelay(); // Önce varsa bağlantıyı kapat (NetworkManager shutdown vs.)
+        string joinCode = await StartRelayHostAsync(maxPlayers);
+        return joinCode;
+    }
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // MultiplayerScene yüklendiğinde UI referanslarını güncelle
+        if (scene.name == "MultiplayerScene")
+        {
+            playerIDText = GameObject.Find("PlayerID").GetComponent<TextMeshProUGUI>();
+            joinCodeText = GameObject.Find("JoinCode").GetComponent<TextMeshProUGUI>();
+            text = GameObject.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
         }
     }
 }

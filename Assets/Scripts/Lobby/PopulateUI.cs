@@ -29,14 +29,14 @@ public class PopulateUI : MonoBehaviour
     public Button startReadyButton;
     public TextMeshProUGUI startReadyButtonText;
     private bool isReady = false;
-    private RelayHostData _hostData;
     bool _relayJoined = false;
+    string lastHostId;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         _currentLobby = GameObject.Find("LobbyManager").GetComponent<CurrentLobby>();
         lobbyId = _currentLobby.currentLobby.Id;
-        InvokeRepeating(nameof(PollForLobbyUpdate), 1.1f, 2f);
+        InvokeRepeating(nameof(PollForLobbyUpdate), 1.1f, 3f);
         UpdateStartReadyButtonUI();
         PopulateUIElements();
     }
@@ -98,25 +98,33 @@ public class PopulateUI : MonoBehaviour
         _currentLobby.currentLobby = await LobbyService.Instance.GetLobbyAsync(lobbyId);
         PopulateUIElements();
 
-        if (!_relayJoined && _currentLobby.currentLobby.Data.TryGetValue("relayJoinCode", out var codeObj))
+         if (_currentLobby.currentLobby.HostId != lastHostId)
         {
-            string joinCode = codeObj.Value;
-            await JoinRelayAndStartClientAsync(joinCode);
+            // İlk kez atama, ya da gerçek bir migration
+            if (lastHostId != null) // İlk poll esnasında runlama (ilk atama değilse)
+                await HandleNewHost(_currentLobby.currentLobby);
+
+            lastHostId = _currentLobby.currentLobby.HostId;
+        }
+
+        if (!_relayJoined && !IsHost() && !NetworkManager.Singleton.IsClient && _currentLobby.currentLobby.Data.TryGetValue("relayJoinCode", out var codeObj))
+        {
             _relayJoined = true; // Tek seferlik
+            await RelayManager.Instance.JoinRelayAsync(codeObj.Value);
         }
     }
-    async Task JoinRelayAndStartClientAsync(string joinCode)
-    {
-        var alloc = await RelayService.Instance.JoinAllocationAsync(joinCode);
+    // async Task JoinRelayAndStartClientAsync(string joinCode)
+    // {
+    //     var alloc = await RelayService.Instance.JoinAllocationAsync(joinCode);
 
-        var utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        utp.SetRelayServerData(alloc.RelayServer.IpV4, (ushort)alloc.RelayServer.Port,
-                               alloc.AllocationIdBytes, alloc.Key,
-                               alloc.ConnectionData, alloc.HostConnectionData);
+    //     var utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
+    //     utp.SetRelayServerData(alloc.RelayServer.IpV4, (ushort)alloc.RelayServer.Port,
+    //                            alloc.AllocationIdBytes, alloc.Key,
+    //                            alloc.ConnectionData, alloc.HostConnectionData);
 
-        NetworkManager.Singleton.StartClient();      // Host sahneyi çoktan yüklemiş olsa bile,
-        // Netcode SceneManager client'ı o sahneye otomatik senkronize eder.
-    }
+    //     NetworkManager.Singleton.StartClient();      // Host sahneyi çoktan yüklemiş olsa bile,
+    //     // Netcode SceneManager client'ı o sahneye otomatik senkronize eder.
+    // }
     // private void ClearContainer()
     // {
     //     if (playerInfoContainer is not null && playerInfoContainer.transform.childCount > 0)
@@ -294,14 +302,14 @@ public class PopulateUI : MonoBehaviour
         }
         startReadyButton.interactable = false;
 
-        int maxConnections = Convert.ToInt32(_currentLobby.currentLobby.Data["maxplayers"].Value); 
-        await CreateRelayAndStartHostAsync(maxConnections);
+        int maxConnections = Convert.ToInt32(_currentLobby.currentLobby.Data["maxplayers"].Value);
+        string joinCode = await RelayManager.Instance.StartRelayHostAsync(maxConnections);
 
         await LobbyService.Instance.UpdateLobbyAsync(lobbyId, new UpdateLobbyOptions
         {
             Data = new Dictionary<string, DataObject>
             {
-                ["relayJoinCode"] = new DataObject(DataObject.VisibilityOptions.Public, _hostData.joinCode),
+                ["relayJoinCode"] = new DataObject(DataObject.VisibilityOptions.Public, joinCode),
                 ["startTime"] = new DataObject(DataObject.VisibilityOptions.Public,
                                                 DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString())
             }
@@ -328,39 +336,97 @@ public class PopulateUI : MonoBehaviour
         startReadyButtonText.text = "Starting...";
         yield return new WaitForSeconds(0.5f); // opsiyonel
 
+        NetworkManager.Singleton.StartHost();
+
         NetworkManager.Singleton.SceneManager.LoadScene(
         "MultiplayerScene",
         UnityEngine.SceneManagement.LoadSceneMode.Single);
     }
-    async Task CreateRelayAndStartHostAsync(int maxConnections)
+    async Task HandleNewHost(Lobby lobby)
     {
-        Debug.Log("Creating Relay Allocation...");
-        Allocation alloc = await RelayService.Instance.CreateAllocationAsync(maxConnections);
-        Debug.Log("Relay Allocation Created.");
+        if (!IsHost()) return;  // Yeni host değilsek pas geç
 
-        _hostData = new RelayHostData()
+        int maxCon = int.Parse(lobby.Data["maxplayers"].Value);
+
+        string joinCode = await RelayManager.Instance.RestartRelayHostAsync(maxCon);
+
+        await LobbyService.Instance.UpdateLobbyAsync(lobbyId, new UpdateLobbyOptions
         {
-            IPv4Address = alloc.RelayServer.IpV4,
-            port = (ushort)alloc.RelayServer.Port,
-            AllocationID = alloc.AllocationId,
-            AllocationIDBytes = alloc.AllocationIdBytes,
-            ConnectionData = alloc.ConnectionData,
-            key = alloc.Key,
-            joinCode = await RelayService.Instance.GetJoinCodeAsync(alloc.AllocationId)
-        };
-
-        Debug.Log($"Join code: {_hostData.joinCode}");
-
-        var utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        utp.SetRelayServerData(
-            _hostData.IPv4Address,
-            _hostData.port,
-            _hostData.AllocationIDBytes,
-            _hostData.key,
-            _hostData.ConnectionData);
-
-        Debug.Log("Starting Host...");
-        NetworkManager.Singleton.StartHost();
-        Debug.Log("Host started.");
+            Data = new Dictionary<string, DataObject>
+            {
+                ["relayJoinCode"] = new DataObject(DataObject.VisibilityOptions.Public, joinCode)
+            },
+            HostId = AuthenticationService.Instance.PlayerId
+        });
     }
+    public async void QuitLobby()
+    {
+        bool amHost = IsHost();
+        string lobbyId = _currentLobby.currentLobby.Id;
+        string playerId = AuthenticationService.Instance.PlayerId;
+
+        if (amHost)
+        {
+            // sadece host varsa oda kapansın
+            if (_currentLobby.currentLobby.Players.Count <= 1)
+            {
+                await LobbyService.Instance.DeleteLobbyAsync(lobbyId);
+                Debug.Log("Host left & lobby deleted.");
+            }
+            else
+            {
+                // host migration: yeni host rastgele seçilir
+                RelayManager.Instance.StopRelay();  // eski host Relay'i kapatır
+
+                await LobbyService.Instance.UpdateLobbyAsync(lobbyId, new UpdateLobbyOptions
+                {
+                    HostId = _currentLobby.currentLobby.Players
+                                .First(p => p.Id != playerId).Id
+                });
+                Debug.Log("Host left, HostId migrated.");
+            }
+        }
+        else
+        {
+            await LobbyService.Instance.RemovePlayerAsync(lobbyId, playerId);
+            Debug.Log("Client left lobby.");
+        }
+
+        // Ağ bağlantısını temizle
+        if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost)
+            NetworkManager.Singleton.Shutdown();
+
+        SceneManager.LoadScene("LobbyBrowserScene");
+    }
+    // async Task CreateRelayAndStartHostAsync(int maxConnections)
+    // {
+    //     Debug.Log("Creating Relay Allocation...");
+    //     Allocation alloc = await RelayService.Instance.CreateAllocationAsync(maxConnections);
+    //     Debug.Log("Relay Allocation Created.");
+
+    //     _hostData = new RelayHostData()
+    //     {
+    //         IPv4Address = alloc.RelayServer.IpV4,
+    //         port = (ushort)alloc.RelayServer.Port,
+    //         AllocationID = alloc.AllocationId,
+    //         AllocationIDBytes = alloc.AllocationIdBytes,
+    //         ConnectionData = alloc.ConnectionData,
+    //         key = alloc.Key,
+    //         joinCode = await RelayService.Instance.GetJoinCodeAsync(alloc.AllocationId)
+    //     };
+
+    //     Debug.Log($"Join code: {_hostData.joinCode}");
+
+    //     var utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
+    //     utp.SetRelayServerData(
+    //         _hostData.IPv4Address,
+    //         _hostData.port,
+    //         _hostData.AllocationIDBytes,
+    //         _hostData.key,
+    //         _hostData.ConnectionData);
+
+    //     Debug.Log("Starting Host...");
+    //     NetworkManager.Singleton.StartHost();
+    //     Debug.Log("Host started.");
+    // }
 }
