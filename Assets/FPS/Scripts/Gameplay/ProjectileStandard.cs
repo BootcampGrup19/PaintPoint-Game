@@ -245,6 +245,13 @@ namespace Unity.FPS.Gameplay
                 }
             }
 
+            // Paintable yüzey varsa boya
+            Paintable paintable = collider.GetComponent<Paintable>();
+            if (paintable != null)
+            {
+                PaintManager.instance.paint(paintable, point, PaintRadius, PaintHardness, PaintStrength, PaintColor);
+            }
+
             // impact vfx
             if (ImpactVfx)
             {
@@ -253,13 +260,6 @@ namespace Unity.FPS.Gameplay
                 if (ImpactVfxLifetime > 0)
                 {
                     Destroy(impactVfxInstance.gameObject, ImpactVfxLifetime);
-                }
-
-                // Paintable yüzey varsa boya
-                Paintable paintable = collider.GetComponent<Paintable>();
-                if (paintable != null)
-                {
-                    PaintManager.instance.paint(paintable, point, PaintRadius, PaintHardness, PaintStrength, PaintColor);
                 }
             }
 
