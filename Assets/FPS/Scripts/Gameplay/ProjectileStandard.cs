@@ -6,6 +6,12 @@ namespace Unity.FPS.Gameplay
 {
     public class ProjectileStandard : ProjectileBase
     {
+        [Header("Paint Settings")]
+        public float PaintRadius = 1f;
+        public float PaintHardness = 1f;
+        public float PaintStrength = 1f;
+        public Color PaintColor = Color.red;
+
         [Header("General")] [Tooltip("Radius of this projectile's collision detection")]
         public float Radius = 0.01f;
 
@@ -247,6 +253,13 @@ namespace Unity.FPS.Gameplay
                 if (ImpactVfxLifetime > 0)
                 {
                     Destroy(impactVfxInstance.gameObject, ImpactVfxLifetime);
+                }
+
+                // Paintable yüzey varsa boya
+                Paintable paintable = collider.GetComponent<Paintable>();
+                if (paintable != null)
+                {
+                    PaintManager.instance.paint(paintable, point, PaintRadius, PaintHardness, PaintStrength, PaintColor);
                 }
             }
 
