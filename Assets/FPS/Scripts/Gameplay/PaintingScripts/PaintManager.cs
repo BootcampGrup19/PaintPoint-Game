@@ -35,6 +35,53 @@ namespace Unity.FPS.Gameplay
             command.name = "CommmandBuffer - " + gameObject.name;
         }
 
+
+        public float CalculatePaintedPercentage(Paintable paintable)
+        {
+            RenderTexture uvIsland = paintable.getUVIslands();
+           
+            RenderTexture activeRT = RenderTexture.active;
+
+            RenderTexture mask = paintable.getMask();
+
+            Texture2D maskTex = new Texture2D(mask.width, mask.height, TextureFormat.RFloat, false);
+            Texture2D uvTex = new Texture2D(uvIsland.width, uvIsland.height, TextureFormat.RFloat, false);
+
+            RenderTexture.active = mask;
+            maskTex.ReadPixels(new Rect(0, 0, mask.width, mask.height), 0, 0);
+            maskTex.Apply();
+
+            RenderTexture.active = uvIsland;
+            uvTex.ReadPixels(new Rect(0, 0, uvIsland.width, uvIsland.height), 0, 0);
+            uvTex.Apply();
+
+            RenderTexture.active = activeRT;
+
+            int paintedPixels = 0;
+            int totalPaintablePixels = 0;
+
+            for (int y = 0; y < mask.height; y++)
+            {
+                for (int x = 0; x < mask.width; x++)
+                {
+                    float uvIslandPixel = uvTex.GetPixel(x, y).r;
+                    if (uvIslandPixel > 0.1f)
+                    {
+                        totalPaintablePixels++;
+                        float maskPixel = maskTex.GetPixel(x, y).r;
+                        if (maskPixel > 0.1f)
+                        {
+                            paintedPixels++;
+                        }
+                    }
+                }
+            }
+    
+            float percent = (float)paintedPixels / totalPaintablePixels * 100f;
+            return percent;
+        }
+
+
         public void initTextures(Paintable paintable)
         {
             RenderTexture mask = paintable.getMask();
