@@ -11,6 +11,9 @@ using NUnit.Framework.Constraints;
 using Unity.Netcode.Transports.UTP;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
+using Unity.Services.Lobbies;
+using System.Collections.Generic;
+using Unity.Services.Lobbies.Models;
 
 public class RelayManager : MonoBehaviour
 {
@@ -21,6 +24,7 @@ public class RelayManager : MonoBehaviour
     [SerializeField] public TextMeshProUGUI playerIDText;
 
     public static RelayManager Instance { get; private set; }
+    public string LobbyId { get; set; }
 
     void Awake()
     {
@@ -67,6 +71,13 @@ public class RelayManager : MonoBehaviour
         
         InitMovementText();
 
+        NetworkManager.Singleton.StartHost();
+
+        await LobbyService.Instance.UpdatePlayerAsync(
+        LobbyId,
+        AuthenticationService.Instance.PlayerId,
+        new UpdatePlayerOptions { AllocationId = allocation.AllocationId.ToString() });
+
         SafeSetText(joinCodeText, "Join Code: " + _hostData.joinCode);
         return _hostData.joinCode;
 
@@ -92,6 +103,12 @@ public class RelayManager : MonoBehaviour
         UnityTransport transport = NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>();
         transport.SetRelayServerData(_joinData.IPv4Address, _joinData.port, _joinData.AllocationIDBytes, _joinData.key, _joinData.ConnectionData, _joinData.HostConnectionData);
         NetworkManager.Singleton.StartClient();
+
+        await LobbyService.Instance.UpdatePlayerAsync(
+        LobbyId,
+        AuthenticationService.Instance.PlayerId,
+        new UpdatePlayerOptions { AllocationId = _joinData.AllocationID.ToString() });
+
         InitMovementText();
     }
     private void InitMovementText()
@@ -121,6 +138,30 @@ public class RelayManager : MonoBehaviour
         StopRelay(); // Önce varsa bağlantıyı kapat (NetworkManager shutdown vs.)
         string joinCode = await StartRelayHostAsync(maxPlayers);
         return joinCode;
+    }
+    public async Task BecomeNewHostAsync(int maxPlayers, string lobbyId)
+    {
+        // 1. start a fresh Relay allocation
+        string newJoinCode = await RestartRelayHostAsync(maxPlayers);
+
+        // 2. write Allocation‑ID & joinCode into Lobby so clients can reconnect
+        await LobbyService.Instance.UpdatePlayerAsync(
+            lobbyId,
+            AuthenticationService.Instance.PlayerId,
+            new UpdatePlayerOptions
+            {
+                AllocationId = _hostData.AllocationID.ToString(),          // Relay integration:contentReference[oaicite:0]{index=0}
+                Data = new Dictionary<string, PlayerDataObject>
+                {
+                    { "relayJoinCode",
+                      new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, newJoinCode) }
+                }
+            });
+
+        // 3. promote myself to lobby host
+        await LobbyService.Instance.UpdateLobbyAsync(
+            lobbyId,
+            new UpdateLobbyOptions { HostId = AuthenticationService.Instance.PlayerId });
     }
     void OnEnable()
     {
