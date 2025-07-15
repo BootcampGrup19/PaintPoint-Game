@@ -33,9 +33,28 @@ public class PopulateUI : MonoBehaviour
     string _lastHostId;
     bool   _iAmMigratedHost = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    async void Start()
     {
-        _currentLobby = GameObject.Find("LobbyManager").GetComponent<CurrentLobby>();
+        _currentLobby = CurrentLobby.Instance.GetComponent<CurrentLobby>();
+
+        // ❶ Lobby verisi yoksa coroutine ile bekle
+        if (_currentLobby.currentLobby == null)
+        {
+            // Yeni lobi oluşturulurken veya join ekranından gelirken
+            int tries = 0;
+            while (_currentLobby.currentLobby == null && tries < 20)   // max 2 sn
+            {
+                await Task.Delay(100);
+                tries++;
+            }
+            if (_currentLobby.currentLobby == null)
+            {
+                Debug.LogError("PopulateUI: CurrentLobby boş. Sahneyi terk ediyorum.");
+                SceneManager.LoadScene("LobbyBrowserScene");
+                return;
+            }
+        }
+
         lobbyId = _currentLobby.currentLobby.Id;
         InvokeRepeating(nameof(PollForLobbyUpdate), 1.1f, 3f);
         UpdateStartReadyButtonUI();
@@ -140,6 +159,9 @@ public class PopulateUI : MonoBehaviour
     }
     public void JoinRedTeam()
     {
+        if (string.IsNullOrEmpty(lobbyId)) return;          // 🔒 güvenlik
+        if (_currentLobby.currentLobby == null) return;
+
         ClearAllTeamContainers();
         playerTeam = "red";
         UpdatePlayerTeam();
@@ -158,6 +180,9 @@ public class PopulateUI : MonoBehaviour
     }
     public void JoinBlueTeam()
     {
+        if (string.IsNullOrEmpty(lobbyId)) return;          // 🔒 güvenlik
+        if (_currentLobby.currentLobby == null) return;
+
         ClearAllTeamContainers();
         playerTeam = "blue";
         UpdatePlayerTeam();
@@ -176,6 +201,9 @@ public class PopulateUI : MonoBehaviour
     }
     public void JoinPlayerInfoArea()
     {
+        if (string.IsNullOrEmpty(lobbyId)) return;          // 🔒 güvenlik
+        if (_currentLobby.currentLobby == null) return;
+
         ClearAllTeamContainers();
         playerTeam = "none";
         UpdatePlayerTeam();
@@ -194,6 +222,9 @@ public class PopulateUI : MonoBehaviour
     }
     async void UpdatePlayerTeam()
     {
+        if (string.IsNullOrEmpty(lobbyId)) return;          // 🔒 güvenlik
+        if (_currentLobby.currentLobby == null) return;
+
         try
         {
             UpdatePlayerOptions options = new UpdatePlayerOptions();
@@ -253,6 +284,9 @@ public class PopulateUI : MonoBehaviour
     }
     async void SetReadyStatus(bool isReady)
     {
+        if (string.IsNullOrEmpty(lobbyId)) return;          // 🔒 güvenlik
+        if (_currentLobby.currentLobby == null) return;
+
         var options = new UpdatePlayerOptions
         {
             Data = new Dictionary<string, PlayerDataObject>
@@ -338,6 +372,8 @@ public class PopulateUI : MonoBehaviour
         _currentLobby.currentLobby = null;
         lobbyId = null;
         RelayManager.Instance.LobbyId = null;
+
+        Destroy(gameObject);
 
         SceneManager.LoadScene("LobbyBrowserScene");
     }
