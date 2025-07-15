@@ -3,5 +3,17 @@ using UnityEngine;
 
 public class CurrentLobby : MonoBehaviour
 {
+    public static CurrentLobby Instance { get; private set; }
     public Lobby currentLobby { get; set; }
+    
+     void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);               // İkinci kopyaya izin verme
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);         // Sahne atlayınca kalıcı
+    }
 }

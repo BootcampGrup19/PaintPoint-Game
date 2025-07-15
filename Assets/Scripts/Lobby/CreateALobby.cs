@@ -8,6 +8,7 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class CreateALobby : MonoBehaviour
 {
@@ -15,7 +16,41 @@ public class CreateALobby : MonoBehaviour
     public TMP_Dropdown teamSize;
     public TMP_InputField lobbyPassword;
     public TMP_InputField password;
+    public Button createLobbyButton;
 
+    void OnEnable(){
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    void OnDisable(){
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    void OnSceneLoaded(Scene s, LoadSceneMode mode)
+    {
+        if (s.name == "LobbyBrowserScene")
+        {
+            StartCoroutine(WaitForInputField());
+
+            password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
+        }
+    }
+    IEnumerator WaitForInputField()
+    {
+        GameObject inputObj = null;
+
+        while (inputObj == null)
+        {
+            inputObj = GameObject.Find("LobbyNameInputField");
+            yield return null; // her frame yeniden dener
+        }
+
+        LobbyName = inputObj.GetComponent<TMP_InputField>();
+        teamSize = GameObject.Find("TeamSizeDropdown").GetComponent<TMP_Dropdown>();
+        lobbyPassword = GameObject.Find("PasswordInputField").GetComponent<TMP_InputField>();
+        createLobbyButton = GameObject.Find("CreateLobbyButton").GetComponent<Button>();
+        
+        createLobbyButton.onClick.RemoveAllListeners();
+        createLobbyButton.onClick.AddListener(CreateLobbyMethod);
+    }
     public async void CreateLobbyMethod()
     {
         string lobbyName = LobbyName.text;
@@ -33,8 +68,8 @@ public class CreateALobby : MonoBehaviour
         options.Player = new Player(AuthenticationService.Instance.PlayerId);
 
         Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
-        DontDestroyOnLoad(this);
-        GetComponent<CurrentLobby>().currentLobby = lobby;
+
+        CurrentLobby.Instance.currentLobby = lobby;
         Debug.Log("Lobby created");
 
         StartCoroutine(HearthBeatLobbyCorootine(lobby.Id, 15f));

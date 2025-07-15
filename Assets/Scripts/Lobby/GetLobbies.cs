@@ -5,6 +5,7 @@ using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
@@ -12,6 +13,29 @@ public class GetLobbies : MonoBehaviour
 {
     public GameObject lobbyRowPrefab;
     public GameObject rowContainer;
+    public Button lobbiesButton;
+    public Button refreshButton;
+
+    void OnEnable(){
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    void OnDisable(){
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    void OnSceneLoaded(Scene s, LoadSceneMode mode)
+    {
+        if (s.name == "LobbyBrowserScene")
+        {
+            rowContainer = GameObject.Find("PlayerContent");
+            lobbiesButton = GameObject.Find("Lobbies").GetComponent<Button>();
+            refreshButton = GameObject.Find("RefreshButton").GetComponent<Button>();
+
+            lobbiesButton.onClick.RemoveAllListeners();
+            refreshButton.onClick.RemoveAllListeners();
+            lobbiesButton.onClick.AddListener(GetLobbiesTest);
+            refreshButton.onClick.AddListener(GetLobbiesTest);
+        }
+    }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     async void Start()
     {
@@ -22,13 +46,6 @@ public class GetLobbies : MonoBehaviour
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public async void GetLobbiesTest()
     {
         ClearContainer();

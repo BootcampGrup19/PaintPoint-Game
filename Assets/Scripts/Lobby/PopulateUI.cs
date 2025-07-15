@@ -35,7 +35,13 @@ public class PopulateUI : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _currentLobby = GameObject.Find("LobbyManager").GetComponent<CurrentLobby>();
+        if (CurrentLobby.Instance.currentLobby == null)
+        {
+            Debug.LogError("PopulateUI → CurrentLobby boş! LobbyBrowser sahnesine dönüyorum.");
+            SceneManager.LoadScene("LobbyBrowserScene");
+            return;
+        }
+        _currentLobby = CurrentLobby.Instance;
         lobbyId = _currentLobby.currentLobby.Id;
         InvokeRepeating(nameof(PollForLobbyUpdate), 1.1f, 3f);
         UpdateStartReadyButtonUI();
@@ -336,7 +342,6 @@ public class PopulateUI : MonoBehaviour
         NetworkManager.Singleton.Shutdown();                             // stop NGO / Relay
 
         _currentLobby.currentLobby = null;
-        lobbyId = null;
         RelayManager.Instance.LobbyId = null;
 
         SceneManager.LoadScene("LobbyBrowserScene");

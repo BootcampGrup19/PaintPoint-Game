@@ -4,13 +4,37 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using WebSocketSharp;
 
 public class JoinLobby : MonoBehaviour
 {
     public TMP_InputField lobbyCode;
     public TMP_InputField password;
+    public Button quickJoinButton;
+    public Button joinButton;
 
+    void OnEnable(){
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    void OnDisable(){
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    void OnSceneLoaded(Scene s, LoadSceneMode mode)
+    {
+        if (s.name == "LobbyBrowserScene")
+        {
+            lobbyCode = GameObject.Find("LobbyJoinCodeInputField").GetComponent<TMP_InputField>();
+            password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
+            quickJoinButton = GameObject.Find("QuickJoinButton").GetComponent<Button>();
+            joinButton = GameObject.Find("JoinButton").GetComponent<Button>();
+
+            quickJoinButton.onClick.RemoveAllListeners();
+            joinButton.onClick.RemoveAllListeners();
+            quickJoinButton.onClick.AddListener(QuickJoinMethod);
+            joinButton.onClick.AddListener(JoinLobbyWithLobbyCode);
+        }
+    }
     public async void JoinLobbyWithLobbyCode()
     {
         var code = lobbyCode.text;
