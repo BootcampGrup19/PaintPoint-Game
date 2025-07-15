@@ -23,6 +23,12 @@ public class GetLobbies : MonoBehaviour
         }
     }
 
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+
     public async void GetLobbiesTest()
     {
         ClearContainer();
