@@ -5,9 +5,11 @@ namespace Unity.FPS.Gameplay
 {
     public class PaintManager : Singleton<PaintManager>
     {
-
         public Shader texturePaint;
         public Shader extendIslands;
+
+        // 🔹 Yeni: Brush Texture tanımı
+        [SerializeField] Texture2D brushTexture;
 
         int prepareUVID = Shader.PropertyToID("_PrepareUV");
         int positionID = Shader.PropertyToID("_PainterPosition");
@@ -19,6 +21,9 @@ namespace Unity.FPS.Gameplay
         int textureID = Shader.PropertyToID("_MainTex");
         int uvOffsetID = Shader.PropertyToID("_OffsetUV");
         int uvIslandsID = Shader.PropertyToID("_UVIslands");
+
+        // 🔹 Yeni: Brush texture ID
+        int brushTexID = Shader.PropertyToID("_PainterBrush");
 
         Material paintMaterial;
         Material extendMaterial;
@@ -33,6 +38,16 @@ namespace Unity.FPS.Gameplay
             extendMaterial = new Material(extendIslands);
             command = new CommandBuffer();
             command.name = "CommmandBuffer - " + gameObject.name;
+
+            // 🔹 Yeni: Shader'a brush texture'ı başlangıçta gönder
+            if (brushTexture != null)
+            {
+                paintMaterial.SetTexture(brushTexID, brushTexture);
+            }
+            else
+            {
+                Debug.LogWarning("Brush texture not assigned in PaintManager.");
+            }
         }
 
         public void initTextures(Paintable paintable)
@@ -55,7 +70,6 @@ namespace Unity.FPS.Gameplay
             command.Clear();
         }
 
-
         public void paint(Paintable paintable, Vector3 pos, float radius = 1f, float hardness = .5f, float strength = .5f, Color? color = null)
         {
             RenderTexture mask = paintable.getMask();
@@ -71,6 +85,11 @@ namespace Unity.FPS.Gameplay
             paintMaterial.SetFloat(radiusID, radius);
             paintMaterial.SetTexture(textureID, support);
             paintMaterial.SetColor(colorID, color ?? Color.red);
+
+            // 🔹 Brush texture shader'a yeniden aktarılabilir (gerekliyse)
+            if (brushTexture != null)
+                paintMaterial.SetTexture(brushTexID, brushTexture);
+
             extendMaterial.SetFloat(uvOffsetID, paintable.extendsIslandOffset);
             extendMaterial.SetTexture(uvIslandsID, uvIslands);
 
@@ -86,6 +105,5 @@ namespace Unity.FPS.Gameplay
             Graphics.ExecuteCommandBuffer(command);
             command.Clear();
         }
-
     }
 }

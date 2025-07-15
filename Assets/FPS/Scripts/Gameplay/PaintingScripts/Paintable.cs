@@ -52,4 +52,3 @@ namespace Unity.FPS.Gameplay
         }
     }
 }
-

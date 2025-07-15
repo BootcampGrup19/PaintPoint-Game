@@ -610,6 +610,10 @@ PrefabInstance:
       value: PaintManager
       objectReference: {fileID: 0}
     - target: {fileID: 5629903721701541910, guid: ab36001ac5341d04aa7b40692170a639, type: 3}
+      propertyPath: brushTexture
+      value: 
+      objectReference: {fileID: 2800000, guid: d5e08fccab73a744baf92995a9843a84, type: 3}
+    - target: {fileID: 5629903721701541910, guid: ab36001ac5341d04aa7b40692170a639, type: 3}
       propertyPath: texturePaint
       value: 
       objectReference: {fileID: 4800000, guid: 9472ed3696ab33d4ab23fb2a11915e0c, type: 3}
