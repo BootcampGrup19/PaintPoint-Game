@@ -72,6 +72,8 @@ namespace Unity.FPS.Gameplay
 
         const QueryTriggerInteraction k_TriggerInteraction = QueryTriggerInteraction.Collide;
 
+        Paintable paintable;
+
         void OnEnable()
         {
             m_ProjectileBase = GetComponent<ProjectileBase>();
@@ -234,6 +236,12 @@ namespace Unity.FPS.Gameplay
                 // area damage
                 AreaOfDamage.InflictDamageInArea(Damage, point, HittableLayers, k_TriggerInteraction,
                     m_ProjectileBase.Owner);
+
+                paintable = collider.GetComponent<Paintable>();
+                if (paintable != null)
+                {
+                    PaintManager.instance.paint(paintable, point, (PaintRadius*5), PaintHardness, PaintStrength, PaintColor);
+                }
             }
             else
             {
@@ -246,7 +254,7 @@ namespace Unity.FPS.Gameplay
             }
 
             // Paintable yüzey varsa boya
-            Paintable paintable = collider.GetComponent<Paintable>();
+            paintable = collider.GetComponent<Paintable>();
             if (paintable != null)
             {
                 PaintManager.instance.paint(paintable, point, PaintRadius, PaintHardness, PaintStrength, PaintColor);
