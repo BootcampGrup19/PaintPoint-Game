@@ -20,6 +20,7 @@ public class PopulateUI : MonoBehaviour
     public TextMeshProUGUI lobbyName;
     public TextMeshProUGUI lobbyCode;
     private CurrentLobby _currentLobby;
+    private CreateALobby createALobby;
     private string lobbyId;
     private string playerTeam;
     public GameObject playerInfoContainer;
@@ -42,7 +43,10 @@ public class PopulateUI : MonoBehaviour
             return;
         }
         _currentLobby = CurrentLobby.Instance;
+        createALobby = GameObject.Find("LobbyManager").GetComponent<CreateALobby>();
+
         lobbyId = _currentLobby.currentLobby.Id;
+
         InvokeRepeating(nameof(PollForLobbyUpdate), 1.1f, 3f);
         UpdateStartReadyButtonUI();
         PopulateUIElements();
@@ -325,13 +329,27 @@ public class PopulateUI : MonoBehaviour
     }
     public async void QuitLobby()
     {
+        createALobby.StopHeartbeatCoroutine();
+        CancelInvoke(nameof(PollForLobbyUpdate));
+
         string pid = AuthenticationService.Instance.PlayerId;
         bool amHost = IsHost();
 
-        CancelInvoke(nameof(PollForLobbyUpdate));
-
         if (amHost && _currentLobby.currentLobby.Players.Count == 1)
         {
+            Debug.Log("Players :" + _currentLobby.currentLobby.Players.Count);
+            // await LobbyService.Instance.UpdateLobbyAsync(
+            //     lobbyId,
+            //     new UpdateLobbyOptions
+            //     {
+            //         Data = new Dictionary<string, DataObject>
+            //         {
+            //             ["status"] = new DataObject(DataObject.VisibilityOptions.Public,
+            //             "closed",
+            //             DataObject.IndexOptions.S1)
+            //         }
+            //     });
+
             await LobbyService.Instance.DeleteLobbyAsync(lobbyId);       // last player → delete
         }
         else

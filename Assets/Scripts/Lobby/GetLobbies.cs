@@ -58,6 +58,10 @@ public class GetLobbies : MonoBehaviour
             options.Filters = new List<QueryFilter>()
             {
                 new QueryFilter(
+                    field: QueryFilter.FieldOptions.S1,
+                    op: QueryFilter.OpOptions.EQ,
+                    value: "open"),
+                new QueryFilter(
                     field: QueryFilter.FieldOptions.AvailableSlots,
                     op: QueryFilter.OpOptions.GT,
                     value: "0")
@@ -104,8 +108,16 @@ public class GetLobbies : MonoBehaviour
     }
     public void Lobby_OnClick(Lobby lobby)
     {
-        Debug.Log("Clicked Lobby " + lobby.Name);
-        GetComponent<JoinLobby>().JoinLobbyWithLobbyId(lobby.Id);
+        try
+        {
+            Debug.Log("Clicked Lobby " + lobby.Name);
+            GetComponent<JoinLobby>().JoinLobbyWithLobbyId(lobby.Id);
+        }
+        catch(LobbyServiceException ex) when
+            (ex.Reason == LobbyExceptionReason.LobbyNotFound)
+        {
+            GetLobbiesTest();
+        }
     }
     private void ClearContainer()
     {

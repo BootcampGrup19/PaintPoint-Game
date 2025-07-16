@@ -17,11 +17,14 @@ public class CreateALobby : MonoBehaviour
     public TMP_InputField lobbyPassword;
     public TMP_InputField password;
     public Button createLobbyButton;
+    private Coroutine heartbeatCoroutine;
 
-    void OnEnable(){
+    void OnEnable()
+    {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
-    void OnDisable(){
+    void OnDisable()
+    {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
     void OnSceneLoaded(Scene s, LoadSceneMode mode)
@@ -47,7 +50,7 @@ public class CreateALobby : MonoBehaviour
         teamSize = GameObject.Find("TeamSizeDropdown").GetComponent<TMP_Dropdown>();
         lobbyPassword = GameObject.Find("PasswordInputField").GetComponent<TMP_InputField>();
         createLobbyButton = GameObject.Find("CreateLobbyButton").GetComponent<Button>();
-        
+
         createLobbyButton.onClick.RemoveAllListeners();
         createLobbyButton.onClick.AddListener(CreateLobbyMethod);
     }
@@ -63,7 +66,11 @@ public class CreateALobby : MonoBehaviour
                 value: lobbyPassword.text)},
             {"maxplayers",
                 new DataObject(DataObject.VisibilityOptions.Private,
-                value: Convert.ToString(maxPlayers))}
+                value: Convert.ToString(maxPlayers))},
+            {"status",
+                new DataObject(DataObject.VisibilityOptions.Public,
+                value: "open",
+                index: DataObject.IndexOptions.S1)}
         };
         options.Player = new Player(AuthenticationService.Instance.PlayerId);
 
@@ -72,7 +79,7 @@ public class CreateALobby : MonoBehaviour
         CurrentLobby.Instance.currentLobby = lobby;
         Debug.Log("Lobby created");
 
-        StartCoroutine(HearthBeatLobbyCorootine(lobby.Id, 15f));
+        heartbeatCoroutine = StartCoroutine(HearthBeatLobbyCorootine(lobby.Id, 15f));
         SceneManager.LoadScene("LobbyRoom");
     }
 
@@ -84,6 +91,14 @@ public class CreateALobby : MonoBehaviour
         {
             LobbyService.Instance.SendHeartbeatPingAsync(lobbyID);
             yield return delay;
+        }
+    }
+    public void StopHeartbeatCoroutine()
+    {
+        if (heartbeatCoroutine != null)
+        {
+            StopCoroutine(heartbeatCoroutine);
+            heartbeatCoroutine = null;
         }
     }
 }
