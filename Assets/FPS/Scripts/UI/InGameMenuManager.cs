@@ -104,14 +104,6 @@ namespace Unity.FPS.UI
 
             }
 
-            if (m_NavigateAction.ReadValue<Vector2>().y != 0)
-            {
-                if (EventSystem.current.currentSelectedGameObject == null)
-                {
-                    EventSystem.current.SetSelectedGameObject(null);
-                    LookSensitivitySlider.Select();
-                }
-            }
         }
 
         public void ClosePauseMenu()
