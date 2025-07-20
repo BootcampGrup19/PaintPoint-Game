@@ -49,3 +49,28 @@ PaintPoint, çok oyunculu ve takım tabanlı, stratejik ve rekabetçi öğeler b
   * Bir sonraki sprintte teknik görevler erkenden başlamalı.
   * Puanlama daha dikkatli ve tahmin odaklı yapılmalı.
   * Günlük kısa kontrollerle ilerleme takip edilmeli.
+ ## Sprint 2
+* Sprint Notları
+  * Sprint 2, projenin temel oynanış mekaniklerinin ve temel oynanışın tamamlandığı sprint olarak planlandı.
+  * Boyama sistemi, online sistem, tasarımların kararlaştırılması ve takımların kazanma kaybetme durumunu içeren görevler tamamlandı fakat çoğu görev hedeflenen son haline ulaşamadı.
+  * Hedeflendiği gibi oluşturulan alt mekaniklerin ve tasarımların çoğu birbirne bağlanamadı, bir bütüne yaklaşılamadı.
+  * Genel olarak düşük motivasyonlu bir sprint oldu.
+* Sprint içinde tamamlamlanması hedeflenen puan: 51
+* Sprint içinde ulaşılan puan: 28
+* Sprint Puan Mantığı: Fibonacci sayı dizisi ile zorluğuna göre puanlanmış toplam 100 puan değerindeki görevler 3 sprinte bölünmüştür. [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/Sprints.png)
+* Daily Scrum: Daily scrum Whatsapp üzerinden yapıldı. [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/DailyScrum%20(2).png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/DailyScrum%20(1).png)
+* Sprint Board Update [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/SprintBoard.png) 
+* Oyun Hakkında Gelişmeler [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress.png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress%20(2).png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress%20(3).png)
+* Sprint Review
+  * Bu sprintte hedeflenen puanın yaklaşık olarak 23 puan gerisinde kalındı.
+  * Bu sprintte takımın 5 üyesi de gereken özveriyi göstermedi.
+  * Bu sprintte sahip olunan bilgilerin planlanan proje için yetersiz olduğu gözlemlendi.
+  * Bütün olumsuzluklara rağmen ateş edilen yerin boyanması, boyanan yerin yüzdesinin hesaplanması ve bunların sunuculara gönderilmesi gibi bazı kritik görevler yerine getirildi.
+  * Proje özellikle tasarımsal açıdan büyük eksiklikler barındırmakta.
+* Sprint Retrospecitve
+  * Bir sonraki sprintte planlanan projenin kapsamı küçültülecek.
+  * Edinilen tecrübeler sonucu daha yapılabilir şeyler üzerine yoğunlaşılacak ve proje bu doğrultuda tamamlanacak.
+  * Tüm ekip üyeleri kalan eğitimlerini tamamladığı için sonraki sprintte eğitimlerin tamamlanmasına vakit harcamayacaklar.
+  * Motivasyonun sağlanması adına daha sık toplantı ve ortak çalışma yapılacak.
+
+
