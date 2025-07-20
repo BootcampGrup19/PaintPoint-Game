@@ -32,7 +32,7 @@ PaintPoint, çok oyunculu ve takım tabanlı, stratejik ve rekabetçi öğeler b
 * Sprint içinde tamamlamlanması hedeflenen puan: 28
 * Sprint içinde ulaşılan puan: 18
 * Sprint Puan Mantığı: Fibonacci sayı dizisi ile zorluğuna göre puanlanmış toplam 100 puan değerindeki görevler 3 sprinte bölünmüştür. [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/Sprints.png)
-* Daily Scrum: Daily scrumlar scrum master toplantısından sonra yapılmaya başlandığı için 2 gün yapılabildi. [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/DailyScrum%20(2).png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/DailyScrum%20(1).png)
+* Daily Scrum: Daily scrum Whatsapp üzerinden yapıldı. [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/DailyScrum%20(2).png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/DailyScrum%20(1).png)
 * Sprint Board Update [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/SprintBoard.png) 
 * Oyun Hakkında Gelişmeler [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress.png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress%20(2).png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress%20(3).png)
 * Sprint Review
@@ -58,9 +58,9 @@ PaintPoint, çok oyunculu ve takım tabanlı, stratejik ve rekabetçi öğeler b
 * Sprint içinde tamamlamlanması hedeflenen puan: 51
 * Sprint içinde ulaşılan puan: 28
 * Sprint Puan Mantığı: Fibonacci sayı dizisi ile zorluğuna göre puanlanmış toplam 100 puan değerindeki görevler 3 sprinte bölünmüştür. [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/Sprints.png)
-* Daily Scrum: Daily scrum Whatsapp üzerinden yapıldı. [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/DailyScrum%20(2).png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/DailyScrum%20(1).png)
-* Sprint Board Update [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/SprintBoard.png) 
-* Oyun Hakkında Gelişmeler [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress.png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress%20(2).png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/GameProgress%20(3).png)
+* Daily Scrum: Daily scrumlar Whatsapp üzerinden yapıldı. [Ekran Görüntüleri](https://github.com/BootcampGrup19/PaintPoint-Game/tree/main/Assets/Images/ScrumImages/Sprint2/Scrum2DailyScrums)
+* Sprint Board Update [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/Sprint2/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-07-21%20001249.png) 
+* Oyun Hakkında Gelişmeler [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/Sprint2/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-07-20%20235633.png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/Sprint2/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-07-21%20000236.png), [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/Sprint2/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-07-21%20000317.png)
 * Sprint Review
   * Bu sprintte hedeflenen puanın yaklaşık olarak 23 puan gerisinde kalındı.
   * Bu sprintte takımın 5 üyesi de gereken özveriyi göstermedi.
