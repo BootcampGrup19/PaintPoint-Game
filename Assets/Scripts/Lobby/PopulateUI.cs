@@ -17,6 +17,7 @@ using Unity.Services.Relay.Models;
 
 public class PopulateUI : MonoBehaviour
 {
+    public static PopulateUI Instance { get; private set; }
     public TextMeshProUGUI lobbyName;
     public TextMeshProUGUI lobbyCode;
     private CurrentLobby _currentLobby;
@@ -33,6 +34,10 @@ public class PopulateUI : MonoBehaviour
     bool _relayJoined = false;
     string _lastHostId;
     bool   _iAmMigratedHost = false;
+    private void Awake()
+    {
+        Instance = this;
+    }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -42,6 +47,7 @@ public class PopulateUI : MonoBehaviour
             SceneManager.LoadScene("LobbyBrowserScene");
             return;
         }
+
         _currentLobby = CurrentLobby.Instance;
         createALobby = GameObject.Find("LobbyManager").GetComponent<CreateALobby>();
 
@@ -49,7 +55,7 @@ public class PopulateUI : MonoBehaviour
 
         InvokeRepeating(nameof(PollForLobbyUpdate), 1.1f, 3f);
         UpdateStartReadyButtonUI();
-        PopulateUIElements();
+        SubscribeToLobbyChanges();
     }
     void UpdateStartReadyButtonUI()
     {
@@ -65,11 +71,22 @@ public class PopulateUI : MonoBehaviour
             startReadyButton.onClick.AddListener(OnReadyButtonClicked);
         }
     }
-    void PopulateUIElements()
+    public void PopulateUIElements()
     {
+        if (this == null || gameObject == null)
+            return;
+
+        if (redTeamContainer == null || blueTeamContainer == null || playerInfoContainer == null || playerInfoPrefab == null)
+        {
+            Debug.LogWarning("UI Container ya da Prefab referanslari eksik. PopulateUIElements çalişmadi.");
+            return;
+        }
+
         ClearAllTeamContainers();
+
         lobbyName.text = _currentLobby.currentLobby.Name;
         lobbyCode.text = "Lobby Code: " + _currentLobby.currentLobby.LobbyCode;
+
         foreach (Player player in _currentLobby.currentLobby.Players)
         {
             if (player.Data != null && player.Data.TryGetValue("team", out var teamData))
@@ -112,7 +129,10 @@ public class PopulateUI : MonoBehaviour
         {
             Debug.Log($"Host changed → new={_currentLobby.currentLobby.HostId}");
             if (_currentLobby.currentLobby.HostId == AuthenticationService.Instance.PlayerId)
-                _iAmMigratedHost = true;                        // I’m the new host
+            {
+                _iAmMigratedHost = true;    // I’m the new host
+                UpdateStartReadyButtonUI();
+            }                        
         }
         _lastHostId = _currentLobby.currentLobby.HostId;
 
@@ -122,30 +142,44 @@ public class PopulateUI : MonoBehaviour
             _iAmMigratedHost = false;                          // run once
             int maxPlayers = int.Parse(_currentLobby.currentLobby.Data["maxplayers"].Value);
             RelayManager.Instance.LobbyId = lobbyId;
+
+            Debug.Log("Yeni host olarak Relay başlatiliyor...");
             await RelayManager.Instance.BecomeNewHostAsync(maxPlayers, lobbyId);
         }
 
         /* ---------- ❸ clients join relay when code appears ---------- */
-        if (!_relayJoined && !IsHost() &&
-            _currentLobby.currentLobby.Data.TryGetValue("relayJoinCode", out var codeObj))
+        if (!_relayJoined && !IsHost() && _currentLobby.currentLobby.Data.ContainsKey("relayJoinCode"))
         {
             _relayJoined = true;
-            await RelayManager.Instance.JoinRelayAsync(codeObj.Value);
+            string joinCode = _currentLobby.currentLobby.Data["relayJoinCode"].Value;
+            Debug.Log("Yeni relayJoinCode bulundu, bağlaniliyor...");
+            await RelayManager.Instance.JoinRelayAsync(joinCode);
         }
     }
     private void ClearAllTeamContainers()
     {
-        foreach (Transform child in redTeamContainer.transform)
+        if(redTeamContainer != null)
         {
-            Destroy(child.gameObject);
+            foreach (Transform child in redTeamContainer.transform)
+            {
+                Destroy(child.gameObject);
+            }
         }
-        foreach (Transform child in blueTeamContainer.transform)
+        
+        if (blueTeamContainer != null)
         {
-            Destroy(child.gameObject);
+            foreach (Transform child in blueTeamContainer.transform)
+            {
+                Destroy(child.gameObject);
+            }
         }
-        foreach (Transform child in playerInfoContainer.transform)
+
+        if (playerInfoContainer != null)
         {
-            Destroy(child.gameObject);
+            foreach (Transform child in playerInfoContainer.transform)
+            {
+                Destroy(child.gameObject);
+            }
         }
     }
     public void JoinRedTeam()
@@ -327,6 +361,52 @@ public class PopulateUI : MonoBehaviour
         "MultiplayerScene",
         UnityEngine.SceneManagement.LoadSceneMode.Single);
     }
+    public async void SubscribeToLobbyChanges()
+    {
+        try
+        {
+            var callbacks = new LobbyEventCallbacks();
+
+            callbacks.LobbyChanged += (changes) =>
+            {
+                if (_currentLobby.currentLobby != null)
+                {
+                    changes.ApplyToLobby(_currentLobby.currentLobby);
+                }
+                else
+                {
+                    Debug.LogWarning("currentLobby null olduğu için ApplyToLobby uygulanmadi.");
+                }
+
+                Debug.Log("Lobby değişti, UI güncelleniyor.");
+                PopulateUIElements();
+            };
+            callbacks.PlayerJoined += (players) =>
+            {
+                foreach (var joinedPlayer in players)
+                {
+                    Debug.Log($"Yeni oyuncu katildi: {joinedPlayer.Player.Id}");
+                    _currentLobby.currentLobby.Players.Add(joinedPlayer.Player);
+                    PopulateUIElements();
+                }
+            };
+            callbacks.PlayerLeft += (players) =>
+            {
+                foreach (var leftPlayer in players)
+                {
+                    Debug.Log($"Oyuncu ayrildi: {Convert.ToString(leftPlayer)}");
+                    _currentLobby.currentLobby.Players.RemoveAll(p => p.Id == Convert.ToString(leftPlayer));
+                    PopulateUIElements();
+                }
+            };
+
+            await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobbyId, callbacks);
+        }
+        catch (LobbyServiceException ex)
+        {
+            Debug.LogError("SubscribeToLobbyEventsAsync hatasi: " + ex);
+        }
+    }
     public async void QuitLobby()
     {
         createALobby.StopHeartbeatCoroutine();
@@ -338,17 +418,6 @@ public class PopulateUI : MonoBehaviour
         if (amHost && _currentLobby.currentLobby.Players.Count == 1)
         {
             Debug.Log("Players :" + _currentLobby.currentLobby.Players.Count);
-            // await LobbyService.Instance.UpdateLobbyAsync(
-            //     lobbyId,
-            //     new UpdateLobbyOptions
-            //     {
-            //         Data = new Dictionary<string, DataObject>
-            //         {
-            //             ["status"] = new DataObject(DataObject.VisibilityOptions.Public,
-            //             "closed",
-            //             DataObject.IndexOptions.S1)
-            //         }
-            //     });
 
             await LobbyService.Instance.DeleteLobbyAsync(lobbyId);       // last player → delete
         }

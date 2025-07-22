@@ -17,14 +17,32 @@ using Unity.Services.Lobbies.Models;
 
 public class RelayManager : MonoBehaviour
 {
+    public static RelayManager Instance { get; private set; }
+    public string LobbyId { get; set; }
     private RelayHostData _hostData;
     private RelayJoinData _joinData;
     [SerializeField] public TextMeshProUGUI joinCodeText;
     [SerializeField] public TextMeshProUGUI text;
     [SerializeField] public TextMeshProUGUI playerIDText;
 
-    public static RelayManager Instance { get; private set; }
-    public string LobbyId { get; set; }
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // MultiplayerScene yüklendiğinde UI referanslarını güncelle
+        if (scene.name == "MultiplayerScene")
+        {
+            playerIDText = GameObject.Find("PlayerID").GetComponent<TextMeshProUGUI>();
+            joinCodeText = GameObject.Find("JoinCode").GetComponent<TextMeshProUGUI>();
+            text = GameObject.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
+        }
+    }
 
     void Awake()
     {
@@ -73,14 +91,27 @@ public class RelayManager : MonoBehaviour
 
         NetworkManager.Singleton.StartHost();
 
+        Debug.Log("Relay host başlatildi: " + AuthenticationService.Instance.PlayerId);
+
         await LobbyService.Instance.UpdatePlayerAsync(
         LobbyId,
         AuthenticationService.Instance.PlayerId,
         new UpdatePlayerOptions { AllocationId = allocation.AllocationId.ToString() });
 
         SafeSetText(joinCodeText, "Join Code: " + _hostData.joinCode);
-        return _hostData.joinCode;
 
+        await LobbyService.Instance.UpdateLobbyAsync(
+        LobbyId,
+        new UpdateLobbyOptions
+        {
+            Data = new Dictionary<string, DataObject>
+            {
+                { "relayJoinCode", new DataObject(DataObject.VisibilityOptions.Public, _hostData.joinCode) },
+                { "startTime", new DataObject(DataObject.VisibilityOptions.Public, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()) }
+            }
+        });
+
+        return _hostData.joinCode;
     }
     public async Task JoinRelayAsync(string joinCode)
     {
@@ -103,6 +134,8 @@ public class RelayManager : MonoBehaviour
         UnityTransport transport = NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>();
         transport.SetRelayServerData(_joinData.IPv4Address, _joinData.port, _joinData.AllocationIDBytes, _joinData.key, _joinData.ConnectionData, _joinData.HostConnectionData);
         NetworkManager.Singleton.StartClient();
+
+        Debug.Log("Relay host başlatildi: " + AuthenticationService.Instance.PlayerId);
 
         await LobbyService.Instance.UpdatePlayerAsync(
         LobbyId,
@@ -160,26 +193,16 @@ public class RelayManager : MonoBehaviour
 
         // 3. promote myself to lobby host
         await LobbyService.Instance.UpdateLobbyAsync(
-            lobbyId,
-            new UpdateLobbyOptions { HostId = AuthenticationService.Instance.PlayerId });
-    }
-    void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-    void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // MultiplayerScene yüklendiğinde UI referanslarını güncelle
-        if (scene.name == "MultiplayerScene")
+        lobbyId,
+        new UpdateLobbyOptions
         {
-            playerIDText = GameObject.Find("PlayerID").GetComponent<TextMeshProUGUI>();
-            joinCodeText = GameObject.Find("JoinCode").GetComponent<TextMeshProUGUI>();
-            text = GameObject.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
-        }
+            HostId = AuthenticationService.Instance.PlayerId,
+            Data = new Dictionary<string, DataObject>
+            {
+                { "relayJoinCode", new DataObject(DataObject.VisibilityOptions.Public, newJoinCode) },
+                { "startTime", new DataObject(DataObject.VisibilityOptions.Public, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()) }
+            }
+        });
     }
 }
 public struct RelayHostData

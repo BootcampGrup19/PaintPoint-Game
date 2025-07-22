@@ -15,6 +15,7 @@ public class GetLobbies : MonoBehaviour
     public GameObject rowContainer;
     public Button lobbiesButton;
     public Button refreshButton;
+    private readonly HashSet<string> _existingLobbyIds = new HashSet<string>();
 
     void OnEnable(){
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -49,6 +50,8 @@ public class GetLobbies : MonoBehaviour
     public async void GetLobbiesTest()
     {
         ClearContainer();
+        _existingLobbyIds.Clear();
+
         try
         {
             QueryLobbiesOptions options = new();
@@ -79,9 +82,13 @@ public class GetLobbies : MonoBehaviour
 
             foreach (Lobby bulunanLobby in lobbies.Results)
             {
+                if (_existingLobbyIds.Contains(bulunanLobby.Id)) continue;
+
                 Debug.Log("Lobby Name: " + bulunanLobby.Name + "\n" +
                 "Time for Created Lobby: " + bulunanLobby.Created + "\n" +
                 "Lobby Code: " + bulunanLobby.LobbyCode);
+
+                _existingLobbyIds.Add(bulunanLobby.Id);
                 CreateLobbyRow(bulunanLobby);
             }
         }
@@ -111,6 +118,13 @@ public class GetLobbies : MonoBehaviour
         try
         {
             Debug.Log("Clicked Lobby " + lobby.Name);
+
+            // JoinLobbyWithLobbyId çağrılmadan önce kontrol:
+            if (CurrentLobby.Instance == null)
+            {
+                Debug.LogError("CurrentLobby bulunamadi. LobbyManager objesi eksik olabilir.");
+            }
+
             GetComponent<JoinLobby>().JoinLobbyWithLobbyId(lobby.Id);
         }
         catch(LobbyServiceException ex) when
@@ -121,11 +135,11 @@ public class GetLobbies : MonoBehaviour
     }
     private void ClearContainer()
     {
-        if (rowContainer is not null && rowContainer.transform.childCount > 0)
+        if (rowContainer != null)
         {
-            foreach (Transform variable in rowContainer.transform)
+            for (int i = rowContainer.transform.childCount - 1; i >= 0; i--)
             {
-                Destroy(variable.gameObject);
+                DestroyImmediate(rowContainer.transform.GetChild(i).gameObject);
             }
         }
     }
