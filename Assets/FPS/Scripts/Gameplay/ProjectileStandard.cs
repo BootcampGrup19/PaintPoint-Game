@@ -240,7 +240,7 @@ namespace Unity.FPS.Gameplay
                 paintable = collider.GetComponent<Paintable>();
                 if (paintable != null)
                 {
-                    PaintManager.instance.paint(paintable, point, (PaintRadius*5), PaintHardness, PaintStrength, PaintColor);
+                    PaintManager.instance.paint(paintable, point, (PaintRadius*3), PaintHardness, PaintStrength, PaintColor);
                 }
             }
             else
