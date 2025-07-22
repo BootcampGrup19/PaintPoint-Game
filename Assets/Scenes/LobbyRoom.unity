@@ -1010,7 +1010,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.27450982}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -7205,6 +7205,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1752736369}
   - component: {fileID: 1752736370}
+  - component: {fileID: 1752736371}
   m_Layer: 0
   m_Name: PopulateUIObject
   m_TagString: Untagged
@@ -7247,6 +7248,18 @@ MonoBehaviour:
   playerInfoPrefab: {fileID: 5071619995171099914, guid: 076ef0f242d9415499c9fdebda2bfbe2, type: 3}
   startReadyButton: {fileID: 434964657}
   startReadyButtonText: {fileID: 684050785}
+--- !u!114 &1752736371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752736368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 782c425789b6565478cc73288c4c7157, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1808345865
 GameObject:
   m_ObjectHideFlags: 0
