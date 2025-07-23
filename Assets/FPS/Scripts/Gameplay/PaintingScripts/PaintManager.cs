@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -132,6 +133,53 @@ namespace Unity.FPS.Gameplay
 
             Graphics.ExecuteCommandBuffer(command);
             command.Clear();
+        }
+
+        public Dictionary<string, float> CalculatePaintedPercentageByColor(Paintable paintable)
+        {
+            RenderTexture support = paintable.getSupport();
+            RenderTexture activeRT = RenderTexture.active;
+
+            Texture2D tex = new Texture2D(support.width, support.height, TextureFormat.RGB24, false);
+            RenderTexture.active = support;
+            tex.ReadPixels(new Rect(0, 0, support.width, support.height), 0, 0);
+            tex.Apply();
+            RenderTexture.active = activeRT;
+
+            Color[] pixels = tex.GetPixels();
+
+            int totalPainted = 0;
+            int red = 0, blue = 0, green = 0, yellow = 0;
+
+            foreach (Color pixel in pixels)
+            {
+                if (pixel.maxColorComponent < 0.1f) continue; // Siyah veya boyanmamýþsa atla
+
+                totalPainted++;
+
+                if (IsApproximately(pixel, Color.red)) red++;
+                else if (IsApproximately(pixel, Color.blue)) blue++;
+                else if (IsApproximately(pixel, Color.green)) green++;
+                else if (IsApproximately(pixel, Color.yellow)) yellow++;
+            }
+
+            Dictionary<string, float> colorRatios = new Dictionary<string, float>();
+            if (totalPainted > 0)
+            {
+                colorRatios["Red"] = (float)red / totalPainted * 100f;
+                colorRatios["Blue"] = (float)blue / totalPainted * 100f;
+                colorRatios["Green"] = (float)green / totalPainted * 100f;
+                colorRatios["Yellow"] = (float)yellow / totalPainted * 100f;
+            }
+
+            return colorRatios;
+        }
+
+        bool IsApproximately(Color a, Color b, float tolerance = 0.1f)
+        {
+            return Mathf.Abs(a.r - b.r) < tolerance &&
+                   Mathf.Abs(a.g - b.g) < tolerance &&
+                   Mathf.Abs(a.b - b.b) < tolerance;
         }
 
     }

@@ -126,7 +126,10 @@ namespace Unity.FPS.Gameplay
                 }
             }
         }
-
+        void Start()
+        {
+            PaintColor = PlayerPaintColor.CurrentPaintColor;
+        }
         void Update()
         {
             // Move

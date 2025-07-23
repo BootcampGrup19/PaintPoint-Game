@@ -63,6 +63,15 @@ namespace Unity.FPS.Gameplay
                 Debug.Log("Boyanma Oraný: " + percent + "%");
 
             }
+
+            if (Keyboard.current.hKey.wasPressedThisFrame)
+            {
+                var ratios = PaintManager.instance.CalculatePaintedPercentageByColor(this);
+                foreach (var kvp in ratios)
+                {
+                    Debug.Log($"{kvp.Key} ile boyanma oraný: {kvp.Value}%");
+                }
+            }
         }
     }
 }
