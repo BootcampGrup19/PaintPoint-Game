@@ -1,20 +1,64 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    [Header("UI Panels")]
     public GameObject lobbyRoomPanel;
     public GameObject characterCustomizationPanel;
+
+    [Header("Cameras")]
     public Camera mainCamera;
     public Camera previewCamera;
+
+    [Header("Option UI")]
+    public GameObject optionButtonPrefab;
+    public Transform optionGrid;
 
     // Main Camera eski pozisyon/rotasyonu
     private Vector3 originalCameraPosition;
     private Quaternion originalCameraRotation;
     private int originalCullingMask;
+    private PreviewCameraRotator characterPreview;
 
+    // UI'de gösterilecek asset görselleri
+    [SerializeField] private Transform characterRoot;
+    public List<CustomizationCategory> customizationCategories;
+    private Dictionary<string, GameObject> equippedPrefabs = new Dictionary<string, GameObject>();
+
+    [System.Serializable]
+    public class CustomizationCategory
+    {
+        public string categoryName;
+        public List<GameObject> availablePrefabs;
+        public Button tabButton;
+    }
+
+    void Start()
+    {
+        characterPreview = GameObject.Find("RotatePivot").GetComponent<PreviewCameraRotator>();
+
+        foreach (var category in customizationCategories)
+        {
+            if (category.tabButton != null)
+            {
+                string capturedCategory = category.categoryName;
+                List<GameObject> capturedPrefabs = category.availablePrefabs;
+
+                category.tabButton.onClick.AddListener(() =>
+                {
+                    PopulateOptions(capturedPrefabs, capturedCategory);
+                });
+            }
+        }
+    }
     public void OnChangeCharacterClicked()
     {
         // Panelleri değiştir
+        characterPreview.inCustomization = false;
         lobbyRoomPanel.SetActive(false);
         characterCustomizationPanel.SetActive(true);
 
@@ -39,6 +83,7 @@ public class UIManager : MonoBehaviour
     public void OnBackToLobbyClicked()
     {
         // Panelleri yönet
+        characterPreview.inCustomization = true;
         characterCustomizationPanel.SetActive(false);
         lobbyRoomPanel.SetActive(true);
 
@@ -53,6 +98,75 @@ public class UIManager : MonoBehaviour
         if (previewCamera != null)
         {
             previewCamera.gameObject.SetActive(true);
+        }
+    }
+    void PopulateOptions(List<GameObject> prefabs, string category)
+    {
+        foreach (Transform child in optionGrid) Destroy(child.gameObject);
+        StartCoroutine(GenerateRuntimePreviews(prefabs, category));
+    }
+    IEnumerator GenerateRuntimePreviews(List<GameObject> prefabs, string category)
+    {
+        // 🔘 NONE Butonu oluştur
+        GameObject noneBtnObj = Instantiate(optionButtonPrefab, optionGrid);
+        RawImage noneImg = noneBtnObj.GetComponentInChildren<RawImage>();
+        Button noneBtn = noneBtnObj.GetComponentInChildren<Button>();
+
+        // Arzu edersen kendin bir None görseli ekleyebilirsin (Resources altına koy)
+        Texture2D noneTex = Resources.Load<Texture2D>("CharacterIcons/None");
+        if (noneTex != null)
+            noneImg.texture = noneTex;
+        else
+            noneImg.color = Color.gray; // Yedek plan
+
+        noneBtn.onClick.AddListener(() => ApplyCustomization(null, category));
+
+        foreach (var prefab in prefabs)
+        {
+            Texture2D tex = RuntimePreviewGenerator.GenerateModelPreview(
+                prefab.transform, 128, 128, true, true);
+            RuntimePreviewGenerator.BackgroundColor = Color.clear;
+
+            var btn = Instantiate(optionButtonPrefab, optionGrid);
+            var img = btn.GetComponentInChildren<RawImage>();
+            img.texture = tex;
+            btn.GetComponentInChildren<Button>().onClick.AddListener(() => ApplyCustomization(prefab, category));
+
+            yield return null;
+        }
+    }
+    public void ApplyCustomization(GameObject selectedPrefab, string category)
+    {
+        // Eğer bu kategoriye ait daha önce yerleştirilmiş prefab varsa, onu yok et
+        if (equippedPrefabs.ContainsKey(category) && equippedPrefabs[category] != null)
+        {
+            Destroy(equippedPrefabs[category]);
+            equippedPrefabs[category] = null;
+        }
+
+        // Yeni prefab varsa instantiate et
+        if (selectedPrefab != null)
+        {
+            GameObject newInstance = Instantiate(selectedPrefab, characterRoot);
+            newInstance.transform.localPosition = Vector3.zero;
+            newInstance.transform.localRotation = Quaternion.identity;
+            newInstance.transform.localScale = Vector3.one;
+
+            equippedPrefabs[category] = newInstance;
+        }
+    }
+     public void RandomizeCharacter()
+    {
+        foreach (var category in customizationCategories)
+        {
+            if (category.availablePrefabs.Count == 0) continue;
+
+            int randomIndex = UnityEngine.Random.Range(0, category.availablePrefabs.Count + 1); // +1 for "none" possibility
+            GameObject randomPrefab = randomIndex < category.availablePrefabs.Count 
+                ? category.availablePrefabs[randomIndex]
+                : null;
+
+            ApplyCustomization(randomPrefab, category.categoryName);
         }
     }
 }

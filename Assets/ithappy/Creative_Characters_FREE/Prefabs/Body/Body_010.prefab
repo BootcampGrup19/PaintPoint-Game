@@ -56,6 +56,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Body_010
       objectReference: {fileID: 0}
+    - target: {fileID: 1962317565584964006, guid: 335f64e53b1ba9648aec09bc1a394a09, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -964220427784028482, guid: 335f64e53b1ba9648aec09bc1a394a09, type: 3}
+    - target: {fileID: 1962317565584964006, guid: 335f64e53b1ba9648aec09bc1a394a09, type: 3}
+      propertyPath: m_Quality
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1962317565584964006, guid: 335f64e53b1ba9648aec09bc1a394a09, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: dbc0ac3b2e21dbd4aaface70d26b6083, type: 2}
+    - target: {fileID: 4718352313427679527, guid: 335f64e53b1ba9648aec09bc1a394a09, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
