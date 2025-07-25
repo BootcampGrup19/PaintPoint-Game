@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Unity.FPS.Gameplay
 {
@@ -49,6 +50,28 @@ namespace Unity.FPS.Gameplay
             uvIslandsRenderTexture.Release();
             extendIslandsRenderTexture.Release();
             supportTexture.Release();
+        }
+
+        private void Update()
+        {
+            if (Keyboard.current.gKey.wasPressedThisFrame)
+            {
+                if (!gameObject.activeInHierarchy)
+                    return;
+
+                float percent = PaintManager.instance.CalculatePaintedPercentage(this);
+                Debug.Log("Boyanma Oraný: " + percent + "%");
+
+            }
+
+            if (Keyboard.current.hKey.wasPressedThisFrame)
+            {
+                var ratios = PaintManager.instance.CalculatePaintedPercentageByColor(this);
+                foreach (var kvp in ratios)
+                {
+                    Debug.Log($"{kvp.Key} ile boyanma oraný: {kvp.Value}%");
+                }
+            }
         }
     }
 }
