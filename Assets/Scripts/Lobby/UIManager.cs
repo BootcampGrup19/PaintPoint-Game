@@ -29,6 +29,10 @@ public class UIManager : MonoBehaviour
     public List<CustomizationCategory> customizationCategories;
     private Dictionary<string, GameObject> equippedPrefabs = new Dictionary<string, GameObject>();
 
+    CharacterCustomizationData data = new CharacterCustomizationData();
+    public GameObject myCharacter;
+    CharacterPreviewLoader previewLoader;
+
     [System.Serializable]
     public class CustomizationCategory
     {
@@ -99,6 +103,19 @@ public class UIManager : MonoBehaviour
         {
             previewCamera.gameObject.SetActive(true);
         }
+        // Karakter verisini burada kullanabilirsin
+        Debug.Log("Karakter verisi kaydedildi:");
+        Debug.Log(JsonUtility.ToJson(data, true));
+
+        myCharacter.GetComponent<NetworkCharacterCustomizer>().SaveCustomization(data);
+
+        previewLoader = FindAnyObjectByType<CharacterPreviewLoader>();
+        previewLoader.LoadPreview(data);
+
+        // Eğer PlayerPrefs ile kaydetmek istiyorsan:
+        string json = JsonUtility.ToJson(data);
+        PlayerPrefs.SetString("CharacterData", json);
+        PlayerPrefs.Save();
     }
     void PopulateOptions(List<GameObject> prefabs, string category)
     {
@@ -153,6 +170,38 @@ public class UIManager : MonoBehaviour
             newInstance.transform.localScale = Vector3.one;
 
             equippedPrefabs[category] = newInstance;
+
+            // Prefab ismini veriye yaz
+            switch (category.ToLower())
+            {
+                case "face": data.faceName = selectedPrefab.name; break;
+                case "hair": data.hairName = selectedPrefab.name; break;
+                case "hat": data.hatName = selectedPrefab.name; break;
+                case "accessories": data.accessoriesName = selectedPrefab.name; break;
+                case "glasses": data.glassesName = selectedPrefab.name; break;
+                case "outerwear": data.outerwearName = selectedPrefab.name; break;
+                case "pants": data.pantsName = selectedPrefab.name; break;
+                case "shoes": data.shoesName = selectedPrefab.name; break;
+                case "gloves": data.glovesName = selectedPrefab.name; break;
+                case "costume": data.costumeName = selectedPrefab.name; break;
+            }
+        }
+        else
+        {
+            // Eğer "None" seçildiyse veriyi temizle
+            switch (category.ToLower())
+            {
+                case "face": data.faceName = ""; break;
+                case "hair": data.hairName = ""; break;
+                case "hat": data.hatName = ""; break;
+                case "accessories": data.accessoriesName = ""; break;
+                case "glasses": data.glassesName = ""; break;
+                case "outerwear": data.outerwearName = ""; break;
+                case "pants": data.pantsName = ""; break;
+                case "shoes": data.shoesName = ""; break;
+                case "gloves": data.glovesName = ""; break;
+                case "costume": data.costumeName = ""; break;
+            }
         }
     }
      public void RandomizeCharacter()
