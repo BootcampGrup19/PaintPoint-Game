@@ -223,6 +223,7 @@ public class PopulateUI : MonoBehaviour
         ClearAllTeamContainers();
         playerTeam = "none";
         UpdatePlayerTeam();
+
         string currentPlayerId = AuthenticationService.Instance.PlayerId;
         foreach (Player player in _currentLobby.currentLobby.Players)
         {

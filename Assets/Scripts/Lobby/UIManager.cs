@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,7 +32,6 @@ public class UIManager : MonoBehaviour
 
     CharacterCustomizationData data = new CharacterCustomizationData();
     public GameObject myCharacter;
-    CharacterPreviewLoader previewLoader;
 
     [System.Serializable]
     public class CustomizationCategory
@@ -58,6 +58,8 @@ public class UIManager : MonoBehaviour
                 });
             }
         }
+
+        data.bodyName = "Body_010";
     }
     public void OnChangeCharacterClicked()
     {
@@ -72,7 +74,7 @@ public class UIManager : MonoBehaviour
         originalCullingMask = mainCamera.cullingMask;
 
         // Yeni kamera pozisyonu ve rotasyonu
-        mainCamera.transform.position = new Vector3(0.5f, 0.3f, 0.5f);
+        mainCamera.transform.position = new Vector3(0.5f, 1.05f, -2.5f);
         mainCamera.transform.rotation = Quaternion.Euler(0f, 17f, 0f);
 
         // Culling Mask'i Everything yap
@@ -108,9 +110,6 @@ public class UIManager : MonoBehaviour
         Debug.Log(JsonUtility.ToJson(data, true));
 
         myCharacter.GetComponent<NetworkCharacterCustomizer>().SaveCustomization(data);
-
-        previewLoader = FindAnyObjectByType<CharacterPreviewLoader>();
-        previewLoader.LoadPreview(data);
 
         // Eğer PlayerPrefs ile kaydetmek istiyorsan:
         string json = JsonUtility.ToJson(data);
@@ -168,13 +167,19 @@ public class UIManager : MonoBehaviour
             newInstance.transform.localPosition = Vector3.zero;
             newInstance.transform.localRotation = Quaternion.identity;
             newInstance.transform.localScale = Vector3.one;
+            newInstance.gameObject.layer = 6;
+
+            foreach (Transform child in newInstance.transform)
+            {
+                child.gameObject.layer = 6;
+            }
 
             equippedPrefabs[category] = newInstance;
 
             // Prefab ismini veriye yaz
             switch (category.ToLower())
             {
-                case "face": data.faceName = selectedPrefab.name; break;
+                case "faces": data.faceName = selectedPrefab.name; break;
                 case "hair": data.hairName = selectedPrefab.name; break;
                 case "hat": data.hatName = selectedPrefab.name; break;
                 case "accessories": data.accessoriesName = selectedPrefab.name; break;
@@ -183,7 +188,7 @@ public class UIManager : MonoBehaviour
                 case "pants": data.pantsName = selectedPrefab.name; break;
                 case "shoes": data.shoesName = selectedPrefab.name; break;
                 case "gloves": data.glovesName = selectedPrefab.name; break;
-                case "costume": data.costumeName = selectedPrefab.name; break;
+                case "costumes": data.costumeName = selectedPrefab.name; break;
             }
         }
         else
@@ -191,7 +196,7 @@ public class UIManager : MonoBehaviour
             // Eğer "None" seçildiyse veriyi temizle
             switch (category.ToLower())
             {
-                case "face": data.faceName = ""; break;
+                case "faces": data.faceName = ""; break;
                 case "hair": data.hairName = ""; break;
                 case "hat": data.hatName = ""; break;
                 case "accessories": data.accessoriesName = ""; break;
@@ -200,7 +205,7 @@ public class UIManager : MonoBehaviour
                 case "pants": data.pantsName = ""; break;
                 case "shoes": data.shoesName = ""; break;
                 case "gloves": data.glovesName = ""; break;
-                case "costume": data.costumeName = ""; break;
+                case "costumes": data.costumeName = ""; break;
             }
         }
     }

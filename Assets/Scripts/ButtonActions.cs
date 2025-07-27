@@ -15,7 +15,21 @@ public class ButtonActions : MonoBehaviour
     public void SubmitNewPosition()
     {
         var playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+
+        if (playerObject == null)
+        {
+            Debug.LogWarning("Local player object not found.");
+            return;
+        }
+
         var player = playerObject.GetComponent<PlayerMovement>();
+
+        if (player == null)
+        {
+            Debug.LogWarning("PlayerMovement component not found.");
+            return;
+        }
+
         player.Move();
     }
 }

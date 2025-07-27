@@ -18,7 +18,7 @@ public class PreviewCameraRotator : MonoBehaviour
     }
     void LateUpdate()
     {
-        if(inCustomization)
+        if(inCustomization && target != null)
         {
             transform.LookAt(target);
             target.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.World);

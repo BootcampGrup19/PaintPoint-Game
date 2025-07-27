@@ -3,6 +3,7 @@ using System;
 [Serializable]
 public class CharacterCustomizationData
 {
+    public string bodyName;
     public string faceName;
     public string hairName;
     public string hatName;

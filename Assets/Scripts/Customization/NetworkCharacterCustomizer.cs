@@ -35,6 +35,9 @@ public class NetworkCharacterCustomizer : NetworkBehaviour
     {
         ClearExistingParts();
 
+        if(!string.IsNullOrEmpty(data.faceName))
+            LoadPart("Body/" + data.bodyName);
+
         if (!string.IsNullOrEmpty(data.faceName))
             LoadPart("Faces/" + data.faceName);
 

@@ -24,6 +24,8 @@ public class TextChatManager : MonoBehaviour
     private const int MaxMessageCount = 50;
     private readonly Queue<GameObject> messageQueue = new Queue<GameObject>();
 
+    private Player player;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     async void Start()
     {
@@ -67,7 +69,7 @@ public class TextChatManager : MonoBehaviour
 
         if (chanelName.options[chanelName.value].text == "Team")
         {
-            Player player = new Player(AuthenticationService.Instance.PlayerId);
+            player = new Player(AuthenticationService.Instance.PlayerId);
 
             if (player.Data != null && player.Data.TryGetValue("team", out var teamdata))
             {
@@ -189,7 +191,13 @@ public class TextChatManager : MonoBehaviour
         // Önce mevcut kanaldan çık
         try
         {
-            LeaveEchoChannelAsync();
+            player.Data.TryGetValue("team", out var teamData);
+
+            if (teamData.Value != "none")
+            {
+                Debug.Log(teamData.Value);
+                LeaveEchoChannelAsync();
+            }
         }
         catch (Exception ex)
         {
@@ -199,15 +207,10 @@ public class TextChatManager : MonoBehaviour
         // Yeni kanal ismini güncelle
         if (chanelName.options[index].text == "Team")
         {
-            Player player = new Player(AuthenticationService.Instance.PlayerId);
 
             if (player.Data != null && player.Data.TryGetValue("team", out var teamdata))
             {
-                tempChanelName = (teamdata.Value == "none") ? "All" : teamdata.Value;
-            }
-            else
-            {
-                tempChanelName = "All";
+                tempChanelName = teamdata.Value;
             }
         }
         else
