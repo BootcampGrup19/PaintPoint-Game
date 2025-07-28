@@ -1,3 +1,4 @@
+using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
@@ -5,8 +6,10 @@ public class CurrentLobby : MonoBehaviour
 {
     public static CurrentLobby Instance { get; private set; }
     public Lobby currentLobby { get; set; }
-    
-     void Awake()
+
+    public string playerName;
+
+    void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -14,6 +17,7 @@ public class CurrentLobby : MonoBehaviour
             return;
         }
         Instance = this;
+        playerName = AuthenticationService.Instance.PlayerName;
         DontDestroyOnLoad(gameObject);         // Sahne atlayınca kalıcı
     }
 }

@@ -194,7 +194,7 @@ public class PopulateUI : MonoBehaviour
             {
                 var text = Instantiate(playerInfoPrefab, Vector3.zero, Quaternion.identity);
                 text.name = player.Joined.ToShortTimeString();
-                text.GetComponentInChildren<TextMeshProUGUI>().text = player.Id;
+                text.GetComponentInChildren<TextMeshProUGUI>().text = _currentLobby.playerName;
                 var rectTransform = text.GetComponent<RectTransform>();
                 rectTransform.SetParent(redTeamContainer.transform);
             }
@@ -212,7 +212,7 @@ public class PopulateUI : MonoBehaviour
             {
                 var text = Instantiate(playerInfoPrefab, Vector3.zero, Quaternion.identity);
                 text.name = player.Joined.ToShortTimeString();
-                text.GetComponentInChildren<TextMeshProUGUI>().text = player.Id;
+                text.GetComponentInChildren<TextMeshProUGUI>().text = _currentLobby.playerName;
                 var rectTransform = text.GetComponent<RectTransform>();
                 rectTransform.SetParent(blueTeamContainer.transform);
             }
@@ -231,7 +231,7 @@ public class PopulateUI : MonoBehaviour
             {
                 var text = Instantiate(playerInfoPrefab, Vector3.zero, Quaternion.identity);
                 text.name = player.Joined.ToShortTimeString();
-                text.GetComponentInChildren<TextMeshProUGUI>().text = player.Id;
+                text.GetComponentInChildren<TextMeshProUGUI>().text = _currentLobby.playerName;
                 var rectTransform = text.GetComponent<RectTransform>();
                 rectTransform.SetParent(playerInfoContainer.transform);
             }
@@ -259,7 +259,7 @@ public class PopulateUI : MonoBehaviour
         var text = Instantiate(playerInfoPrefab, Vector3.zero, Quaternion.identity);
 
         text.name = player.Joined.ToShortTimeString();
-        text.GetComponentInChildren<TextMeshProUGUI>().text = player.Id;
+        text.GetComponentInChildren<TextMeshProUGUI>().text = _currentLobby.playerName;
 
         var readyTextgo = text.transform.Find("PlayerReadyText").gameObject;
 
@@ -356,6 +356,8 @@ public class PopulateUI : MonoBehaviour
         startReadyButtonText.text = "Starting...";
         yield return new WaitForSeconds(0.5f); // opsiyonel
 
+        TextChatManager.Instance.QuitChatChannelAsync();
+
         NetworkManager.Singleton.StartHost();
 
         NetworkManager.Singleton.SceneManager.LoadScene(
@@ -419,11 +421,13 @@ public class PopulateUI : MonoBehaviour
         if (amHost && _currentLobby.currentLobby.Players.Count == 1)
         {
             Debug.Log("Players :" + _currentLobby.currentLobby.Players.Count);
+            TextChatManager.Instance.QuitChatChannelAsync();
 
             await LobbyService.Instance.DeleteLobbyAsync(lobbyId);       // last player → delete
         }
         else
         {
+            TextChatManager.Instance.QuitChatChannelAsync();
             await LobbyService.Instance.RemovePlayerAsync(lobbyId, pid); // leave but keep lobby
         }
 

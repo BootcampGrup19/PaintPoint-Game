@@ -46,6 +46,16 @@ public class GetLobbies : MonoBehaviour
         {
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
+
+        if (string.IsNullOrEmpty(AuthenticationService.Instance.PlayerName))
+        {
+            string randomName = $"Player_{UnityEngine.Random.Range(1000, 9999)}";
+            await AuthenticationService.Instance.UpdatePlayerNameAsync(randomName);
+        }
+        else
+        {
+            Debug.Log("Existing player name: " + AuthenticationService.Instance.PlayerName);
+        }
     }
     public async void GetLobbiesTest()
     {
@@ -104,7 +114,7 @@ public class GetLobbies : MonoBehaviour
         row.name = lobby.Name;
 
         row.transform.Find("LobbyNameText").GetComponent<TextMeshProUGUI>().text = lobby.Name;
-        row.transform.Find("OwnerText").GetComponent<TextMeshProUGUI>().text = lobby.HostId;
+        row.transform.Find("OwnerText").GetComponent<TextMeshProUGUI>().text = AuthenticationService.Instance.PlayerName;
         row.transform.Find("PlayerCountText").GetComponent<TextMeshProUGUI>().text = lobby.Players.Count + "/" + lobby.MaxPlayers;
 
         var rectTransform = row.GetComponent<RectTransform>();

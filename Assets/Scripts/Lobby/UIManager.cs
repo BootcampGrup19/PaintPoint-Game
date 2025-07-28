@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
 
 public class UIManager : MonoBehaviour
 {
@@ -31,7 +32,7 @@ public class UIManager : MonoBehaviour
     private Dictionary<string, GameObject> equippedPrefabs = new Dictionary<string, GameObject>();
 
     CharacterCustomizationData data = new CharacterCustomizationData();
-    public GameObject myCharacter;
+    //public GameObject myCharacter;
 
     [System.Serializable]
     public class CustomizationCategory
@@ -109,7 +110,12 @@ public class UIManager : MonoBehaviour
         Debug.Log("Karakter verisi kaydedildi:");
         Debug.Log(JsonUtility.ToJson(data, true));
 
-        myCharacter.GetComponent<NetworkCharacterCustomizer>().SaveCustomization(data);
+        //myCharacter.GetComponent<NetworkCharacterCustomizer>().SaveCustomization(data);
+        var player = NetworkManager.Singleton.LocalClient.PlayerObject;
+        if (player != null)
+        {
+            player.GetComponent<NetworkCharacterCustomizer>().SaveCustomization(data);
+        }
 
         // Eğer PlayerPrefs ile kaydetmek istiyorsan:
         string json = JsonUtility.ToJson(data);
@@ -172,6 +178,14 @@ public class UIManager : MonoBehaviour
             foreach (Transform child in newInstance.transform)
             {
                 child.gameObject.layer = 6;
+
+                if (category == "Costumes")
+                {
+                    foreach (Transform child2 in child)
+                    {
+                        child2.gameObject.layer = 6;
+                    }
+                }
             }
 
             equippedPrefabs[category] = newInstance;

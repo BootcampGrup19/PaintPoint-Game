@@ -56,6 +56,14 @@ public class JoinLobby : MonoBehaviour
                 options.Password = enteredPassword;
             }
 
+            options.Player = new Player(AuthenticationService.Instance.PlayerId)
+            {
+                Data = new Dictionary<string, PlayerDataObject>
+                {
+                    {"team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "none")}
+                }
+            };
+
             Lobby lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, options);
 
             DontDestroyOnLoad(this);
@@ -87,6 +95,14 @@ public class JoinLobby : MonoBehaviour
             {
                 options.Password = enteredPassword;
             }
+
+            options.Player = new Player(AuthenticationService.Instance.PlayerId)
+            {
+                Data = new Dictionary<string, PlayerDataObject>
+                {
+                    {"team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "none")}
+                }
+            };
 
             Lobby lobby1 = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId, options);
 
@@ -138,7 +154,6 @@ public class JoinLobby : MonoBehaviour
         }
 
         // ✅ relayJoinCode'u çek
-        //var player = _currentLobby.currentLobby.Players.Find(p => p.Id == AuthenticationService.Instance.PlayerId);
         if (_currentLobby.currentLobby.Data.TryGetValue("relayJoinCode", out var relayCodeObj))
         {
             string relayJoinCode = relayCodeObj.Value;
@@ -154,20 +169,22 @@ public class JoinLobby : MonoBehaviour
         {
             Debug.Log("relayJoinCode Lobby.Data'da bulunamadi. Host henüz başlatmamiş olabilir.");
         }
-
-        /*if (PopulateUI.Instance != null)
-        {
-            PopulateUI.Instance.SubscribeToLobbyChanges(); // 🔄 UI güncellemelerini başlat
-        }
-        else
-        {
-            Debug.LogWarning("PopulateUI.Instance null → SubscribeToLobbyChanges yapilamadi.");
-        }*/
     }
     public async void QuickJoinMethod()
     {
         try
         {
+            QuickJoinLobbyOptions options = new QuickJoinLobbyOptions
+            {
+                Player = new Player(AuthenticationService.Instance.PlayerId)
+                {
+                    Data = new Dictionary<string, PlayerDataObject>
+                    {
+                        {"team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "none")}
+                    }
+                }
+            };
+
             Lobby lobby = await LobbyService.Instance.QuickJoinLobbyAsync();
             DontDestroyOnLoad(this);
             GetComponent<CurrentLobby>().currentLobby = lobby;

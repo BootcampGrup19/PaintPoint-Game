@@ -72,7 +72,13 @@ public class CreateALobby : MonoBehaviour
                 value: "open",
                 index: DataObject.IndexOptions.S1)}
         };
-        options.Player = new Player(AuthenticationService.Instance.PlayerId);
+        options.Player = new Player(AuthenticationService.Instance.PlayerId)
+        {
+            Data = new Dictionary<string, PlayerDataObject>
+            {
+                { "team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "none") }
+            }
+        };
 
         Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
 

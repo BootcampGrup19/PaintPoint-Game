@@ -12,6 +12,8 @@ using System.ComponentModel;
 
 public class TextChatManager : MonoBehaviour
 {
+    public static TextChatManager Instance { get; private set; }
+
     [Header("UI References")]
     public TMP_InputField sendInput;
     public TMP_Dropdown chanelName;
@@ -26,13 +28,18 @@ public class TextChatManager : MonoBehaviour
 
     private Player player;
 
+    void Awake()
+    {
+        Instance = this;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     async void Start()
     {
         await VivoxService.Instance.InitializeAsync();
 
         LoginOptions options = new LoginOptions();
-        options.DisplayName = AuthenticationService.Instance.PlayerId;
+        options.DisplayName = AuthenticationService.Instance.PlayerName;
         await VivoxService.Instance.LoginAsync(options);
 
         sendMessageAction = new InputAction(type: InputActionType.Button, binding: "<Keyboard>/enter");

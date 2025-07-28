@@ -1,41 +1,59 @@
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Collections;
 
 public class NetworkCharacterCustomizer : NetworkBehaviour
 {
     public Transform characterRoot; // Parçaların instantiate edileceği yer
 
-    private CharacterCustomizationData customizationData;
+    public NetworkVariable<FixedString4096Bytes> customizationData = new NetworkVariable<FixedString4096Bytes>(
+        writePerm: NetworkVariableWritePermission.Owner);
 
     public void SaveCustomization(CharacterCustomizationData data)
     {
-        customizationData = data;
+        string json = JsonUtility.ToJson(data);
+        PlayerPrefs.SetString("CharacterData", json);
+        PlayerPrefs.Save();
 
         if (IsOwner)
         {
-            string json = JsonUtility.ToJson(data);
-            SubmitCustomizationServerRpc(json);
+            customizationData.Value = json; // Otomatik sync olacak
         }
     }
-
-    [ServerRpc]
-    private void SubmitCustomizationServerRpc(string json)
+    public override void OnNetworkSpawn()
     {
-        BroadcastCustomizationClientRpc(json);
-    }
+         Debug.Log($"[{OwnerClientId}] OnNetworkSpawn called. IsOwner: {IsOwner}, customizationData: {customizationData.Value}");
+        customizationData.OnValueChanged += OnCustomizationChanged;
 
-    [ClientRpc]
-    private void BroadcastCustomizationClientRpc(string json)
+        // SADECE OWNER İSE VE LOCAL PLAYER PREFS VARSA DEĞERİ ATA
+        if (IsOwner && PlayerPrefs.HasKey("CharacterData"))
+        {
+            string json = PlayerPrefs.GetString("CharacterData");
+            customizationData.Value = json;
+            Debug.Log($"[{OwnerClientId}] Loaded customization from PlayerPrefs: {json}");
+        }
+
+        // Tüm oyuncular için (host ve client) ilk değer zaten sync edildiyse onu uygula
+        if (!string.IsNullOrEmpty(customizationData.Value.ToString()))
+        {
+            Debug.Log($"[{OwnerClientId}] Applying customization from synced value");
+            CharacterCustomizationData data = JsonUtility.FromJson<CharacterCustomizationData>(customizationData.Value.ToString());
+            ApplyCustomization(data);
+        }
+    }
+    private void OnCustomizationChanged(FixedString4096Bytes oldValue, FixedString4096Bytes newValue)
     {
-        CharacterCustomizationData data = JsonUtility.FromJson<CharacterCustomizationData>(json);
-        ApplyCustomization(data);
+        if (!string.IsNullOrEmpty(newValue.ToString()))
+        {
+            CharacterCustomizationData data = JsonUtility.FromJson<CharacterCustomizationData>(newValue.ToString());
+            ApplyCustomization(data);
+        }
     }
-
     public void ApplyCustomization(CharacterCustomizationData data)
     {
         ClearExistingParts();
 
-        if(!string.IsNullOrEmpty(data.faceName))
+        if (!string.IsNullOrEmpty(data.faceName))
             LoadPart("Body/" + data.bodyName);
 
         if (!string.IsNullOrEmpty(data.faceName))
@@ -117,21 +135,6 @@ public class NetworkCharacterCustomizer : NetworkBehaviour
         foreach (Transform child in characterRoot)
         {
             Destroy(child.gameObject);
-        }
-    }
-    public override void OnNetworkSpawn()
-    {
-        base.OnNetworkSpawn();
-
-        if (IsOwner)
-        {
-            if (PlayerPrefs.HasKey("CharacterData"))
-            {
-                string json = PlayerPrefs.GetString("CharacterData");
-                CharacterCustomizationData data = JsonUtility.FromJson<CharacterCustomizationData>(json);
-
-                SaveCustomization(data); // Bu hem kendine uygular hem sunucuya yollar
-            }
         }
     }
 }
