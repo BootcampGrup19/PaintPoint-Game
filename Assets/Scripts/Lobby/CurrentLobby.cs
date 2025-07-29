@@ -7,8 +7,6 @@ public class CurrentLobby : MonoBehaviour
     public static CurrentLobby Instance { get; private set; }
     public Lobby currentLobby { get; set; }
 
-    public string playerName;
-
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -17,7 +15,6 @@ public class CurrentLobby : MonoBehaviour
             return;
         }
         Instance = this;
-        playerName = AuthenticationService.Instance.PlayerName;
         DontDestroyOnLoad(gameObject);         // Sahne atlayınca kalıcı
     }
 }

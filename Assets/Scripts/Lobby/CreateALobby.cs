@@ -76,7 +76,8 @@ public class CreateALobby : MonoBehaviour
         {
             Data = new Dictionary<string, PlayerDataObject>
             {
-                { "team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "none") }
+                { "playerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, AuthenticationService.Instance.PlayerName) },
+                { "team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, "none") }
             }
         };
 

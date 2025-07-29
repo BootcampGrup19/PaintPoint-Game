@@ -38,7 +38,7 @@ public class GetLobbies : MonoBehaviour
         }
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    async void Start()
+    async void Awake()
     {
         await UnityServices.InitializeAsync();
 
@@ -114,7 +114,7 @@ public class GetLobbies : MonoBehaviour
         row.name = lobby.Name;
 
         row.transform.Find("LobbyNameText").GetComponent<TextMeshProUGUI>().text = lobby.Name;
-        row.transform.Find("OwnerText").GetComponent<TextMeshProUGUI>().text = AuthenticationService.Instance.PlayerName;
+        row.transform.Find("OwnerText").GetComponent<TextMeshProUGUI>().text = lobby.Players.Find(p => p.Id == lobby.HostId)?.Data["playerName"].Value ?? "Unknown";
         row.transform.Find("PlayerCountText").GetComponent<TextMeshProUGUI>().text = lobby.Players.Count + "/" + lobby.MaxPlayers;
 
         var rectTransform = row.GetComponent<RectTransform>();

@@ -17,6 +17,7 @@ public class JoinLobby : MonoBehaviour
     public Button quickJoinButton;
     public Button joinButton;
     private CurrentLobby _currentLobby;
+    private string playerName;
 
     void OnEnable(){
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -42,6 +43,7 @@ public class JoinLobby : MonoBehaviour
     private void Start()
     {
         _currentLobby = CurrentLobby.Instance;
+        playerName = AuthenticationService.Instance.PlayerName;
     }
     public async void JoinLobbyWithLobbyCode()
     {
@@ -60,7 +62,8 @@ public class JoinLobby : MonoBehaviour
             {
                 Data = new Dictionary<string, PlayerDataObject>
                 {
-                    {"team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "none")}
+                    { "playerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerName)},
+                    { "team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, "none")}
                 }
             };
 
@@ -96,13 +99,13 @@ public class JoinLobby : MonoBehaviour
                 options.Password = enteredPassword;
             }
 
-            options.Player = new Player(AuthenticationService.Instance.PlayerId)
-            {
-                Data = new Dictionary<string, PlayerDataObject>
+            options.Player = new Player(AuthenticationService.Instance.PlayerId,
+                data: new Dictionary<string, PlayerDataObject>
                 {
-                    {"team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "none")}
+                    { "playerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerName)},
+                    { "team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, "none")}
                 }
-            };
+            );
 
             Lobby lobby1 = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId, options);
 
@@ -180,7 +183,8 @@ public class JoinLobby : MonoBehaviour
                 {
                     Data = new Dictionary<string, PlayerDataObject>
                     {
-                        {"team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "none")}
+                        { "playerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerName) },
+                        { "team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, "none")}
                     }
                 }
             };

@@ -194,7 +194,7 @@ public class PopulateUI : MonoBehaviour
             {
                 var text = Instantiate(playerInfoPrefab, Vector3.zero, Quaternion.identity);
                 text.name = player.Joined.ToShortTimeString();
-                text.GetComponentInChildren<TextMeshProUGUI>().text = _currentLobby.playerName;
+                text.GetComponentInChildren<TextMeshProUGUI>().text = (player.Data != null && player.Data.ContainsKey("playerName"))? player.Data["playerName"].Value: "Unknown";
                 var rectTransform = text.GetComponent<RectTransform>();
                 rectTransform.SetParent(redTeamContainer.transform);
             }
@@ -212,7 +212,7 @@ public class PopulateUI : MonoBehaviour
             {
                 var text = Instantiate(playerInfoPrefab, Vector3.zero, Quaternion.identity);
                 text.name = player.Joined.ToShortTimeString();
-                text.GetComponentInChildren<TextMeshProUGUI>().text = _currentLobby.playerName;
+                text.GetComponentInChildren<TextMeshProUGUI>().text = (player.Data != null && player.Data.ContainsKey("playerName"))? player.Data["playerName"].Value: "Unknown";
                 var rectTransform = text.GetComponent<RectTransform>();
                 rectTransform.SetParent(blueTeamContainer.transform);
             }
@@ -231,7 +231,7 @@ public class PopulateUI : MonoBehaviour
             {
                 var text = Instantiate(playerInfoPrefab, Vector3.zero, Quaternion.identity);
                 text.name = player.Joined.ToShortTimeString();
-                text.GetComponentInChildren<TextMeshProUGUI>().text = _currentLobby.playerName;
+                text.GetComponentInChildren<TextMeshProUGUI>().text = (player.Data != null && player.Data.ContainsKey("playerName"))? player.Data["playerName"].Value: "Unknown";
                 var rectTransform = text.GetComponent<RectTransform>();
                 rectTransform.SetParent(playerInfoContainer.transform);
             }
@@ -244,7 +244,7 @@ public class PopulateUI : MonoBehaviour
             UpdatePlayerOptions options = new UpdatePlayerOptions();
             options.Data = new Dictionary<string, PlayerDataObject>()
             {
-                {"team", new PlayerDataObject(visibility: PlayerDataObject.VisibilityOptions.Member, value: playerTeam)}
+                {"team", new PlayerDataObject(visibility: PlayerDataObject.VisibilityOptions.Public, value: playerTeam)}
             };
             await LobbyService.Instance.UpdatePlayerAsync(lobbyId, AuthenticationService.Instance.PlayerId, options);
         }
@@ -259,7 +259,7 @@ public class PopulateUI : MonoBehaviour
         var text = Instantiate(playerInfoPrefab, Vector3.zero, Quaternion.identity);
 
         text.name = player.Joined.ToShortTimeString();
-        text.GetComponentInChildren<TextMeshProUGUI>().text = _currentLobby.playerName;
+        text.GetComponentInChildren<TextMeshProUGUI>().text = (player.Data != null && player.Data.ContainsKey("playerName"))? player.Data["playerName"].Value: "Unknown";
 
         var readyTextgo = text.transform.Find("PlayerReadyText").gameObject;
 
@@ -357,8 +357,6 @@ public class PopulateUI : MonoBehaviour
         yield return new WaitForSeconds(0.5f); // opsiyonel
 
         TextChatManager.Instance.QuitChatChannelAsync();
-
-        NetworkManager.Singleton.StartHost();
 
         NetworkManager.Singleton.SceneManager.LoadScene(
         "MultiplayerScene",

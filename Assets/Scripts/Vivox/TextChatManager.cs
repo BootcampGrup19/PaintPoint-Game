@@ -9,6 +9,8 @@ using Unity.Services.Lobbies.Models;
 using Unity.VisualScripting;
 using UnityEngine.InputSystem;
 using System.ComponentModel;
+using Unity.Services.Lobbies;
+using System.Linq;
 
 public class TextChatManager : MonoBehaviour
 {
@@ -25,8 +27,8 @@ public class TextChatManager : MonoBehaviour
     [SerializeField] private GameObject textMessagePrefab; // Prefab referansı
     private const int MaxMessageCount = 50;
     private readonly Queue<GameObject> messageQueue = new Queue<GameObject>();
-
-    private Player player;
+    private CurrentLobby _currentLobby;
+    private Player LocalPlayer => _currentLobby.currentLobby?.Players?.Find(p => p.Id == AuthenticationService.Instance.PlayerId);
 
     void Awake()
     {
@@ -36,10 +38,12 @@ public class TextChatManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     async void Start()
     {
+        _currentLobby = CurrentLobby.Instance;
+
         await VivoxService.Instance.InitializeAsync();
 
         LoginOptions options = new LoginOptions();
-        options.DisplayName = AuthenticationService.Instance.PlayerName;
+        options.DisplayName = _currentLobby.currentLobby.Players.Find(p => p.Id == AuthenticationService.Instance.PlayerId)?.Data["playerName"].Value ?? "Unknown";
         await VivoxService.Instance.LoginAsync(options);
 
         sendMessageAction = new InputAction(type: InputActionType.Button, binding: "<Keyboard>/enter");
@@ -66,8 +70,7 @@ public class TextChatManager : MonoBehaviour
     }
     async void SubscribeVivoxChannel()
     {
-        var current = CurrentLobby.Instance;
-        lobbyId = current.currentLobby.Id;
+        lobbyId = _currentLobby.currentLobby.Id;
         if (string.IsNullOrEmpty(lobbyId))
         {
             Debug.LogError("Vivox: LobbyId boş!");
@@ -76,9 +79,9 @@ public class TextChatManager : MonoBehaviour
 
         if (chanelName.options[chanelName.value].text == "Team")
         {
-            player = new Player(AuthenticationService.Instance.PlayerId);
+            var localPlayer = LocalPlayer;
 
-            if (player.Data != null && player.Data.TryGetValue("team", out var teamdata))
+            if (localPlayer != null && localPlayer.Data != null && localPlayer.Data.TryGetValue("team", out var teamdata))
             {
                 if (teamdata.Value == "none")
                 {
@@ -195,15 +198,19 @@ public class TextChatManager : MonoBehaviour
     {
         Debug.Log("Dropdown değişti. Kanal değiştiriliyor...");
 
+        var localPlayer = LocalPlayer;
+        if (localPlayer == null) return;
+
         // Önce mevcut kanaldan çık
         try
         {
-            player.Data.TryGetValue("team", out var teamData);
-
-            if (teamData.Value != "none")
+            if (localPlayer != null && localPlayer.Data != null && localPlayer.Data.TryGetValue("team", out var teamData))
             {
-                Debug.Log(teamData.Value);
-                LeaveEchoChannelAsync();
+                if (teamData.Value != "none")
+                {
+                    Debug.Log(teamData.Value);
+                    LeaveEchoChannelAsync();
+                }
             }
         }
         catch (Exception ex)
@@ -212,12 +219,16 @@ public class TextChatManager : MonoBehaviour
         }
 
         // Yeni kanal ismini güncelle
-        if (chanelName.options[index].text == "Team")
+        if (chanelName.options[index].text == "Team" && localPlayer.Data.TryGetValue("team", out var teamValue))
         {
 
-            if (player.Data != null && player.Data.TryGetValue("team", out var teamdata))
+            if (teamValue.Value == "none")
             {
-                tempChanelName = teamdata.Value;
+                tempChanelName = "All";
+            }
+            else
+            {
+                tempChanelName = teamValue.Value;
             }
         }
         else
@@ -225,10 +236,16 @@ public class TextChatManager : MonoBehaviour
             tempChanelName = chanelName.options[index].text;
         }
 
-        Debug.Log($"Yeni kanal: {tempChanelName}");
+        if (VivoxService.Instance.ActiveChannels.Any(c => c.Key == tempChanelName))
+        {
+            Debug.Log($"Zaten {tempChanelName} kanalina bağlisin.");
+            return; // Aynı kanalsa tekrar bağlanma
+        }
 
         // Yeni kanala bağlan
         await VivoxService.Instance.JoinGroupChannelAsync(tempChanelName, ChatCapability.TextOnly);
+
+        Debug.Log($"Yeni kanal: {tempChanelName}");
 
         // Chat ekranına bilgi mesajı ekle
         DisplayMessage("System", $"[Info] Changed to channel: {tempChanelName}", DateTime.Now, tempChanelName, false);
