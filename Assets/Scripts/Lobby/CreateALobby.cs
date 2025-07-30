@@ -32,12 +32,20 @@ public class CreateALobby : MonoBehaviour
         if (s.name == "LobbyBrowserScene")
         {
             StartCoroutine(WaitForInputField());
-
-            password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
         }
     }
     IEnumerator WaitForInputField()
     {
+        GameObject controller = null;
+
+        while (controller == null)
+        {
+            controller = GameObject.Find("LobbyBrowserScenePanel");
+            yield return null; // her frame yeniden dener
+        }
+
+        password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
+
         GameObject inputObj = null;
 
         while (inputObj == null)

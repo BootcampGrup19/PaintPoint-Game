@@ -29,16 +29,28 @@ public class JoinLobby : MonoBehaviour
     {
         if (s.name == "LobbyBrowserScene")
         {
-            lobbyCode = GameObject.Find("LobbyJoinCodeInputField").GetComponent<TMP_InputField>();
-            password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
-            quickJoinButton = GameObject.Find("QuickJoinButton").GetComponent<Button>();
-            joinButton = GameObject.Find("JoinButton").GetComponent<Button>();
-
-            quickJoinButton.onClick.RemoveAllListeners();
-            joinButton.onClick.RemoveAllListeners();
-            quickJoinButton.onClick.AddListener(QuickJoinMethod);
-            joinButton.onClick.AddListener(JoinLobbyWithLobbyCode);
+            StartCoroutine(WaitForInputField());
         }
+    }
+    IEnumerator WaitForInputField()
+    {
+        GameObject inputObj = null;
+
+        while (inputObj == null)
+        {
+            inputObj = GameObject.Find("LobbyBrowserScenePanel");
+            yield return null; // her frame yeniden dener
+        }
+
+        lobbyCode = GameObject.Find("LobbyJoinCodeInputField").GetComponent<TMP_InputField>();
+        password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
+        quickJoinButton = GameObject.Find("QuickJoinButton").GetComponent<Button>();
+        joinButton = GameObject.Find("JoinButton").GetComponent<Button>();
+
+        quickJoinButton.onClick.RemoveAllListeners();
+        joinButton.onClick.RemoveAllListeners();
+        quickJoinButton.onClick.AddListener(QuickJoinMethod);
+        joinButton.onClick.AddListener(JoinLobbyWithLobbyCode);
     }
     private void Start()
     {

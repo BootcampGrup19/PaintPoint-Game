@@ -11,6 +11,7 @@ using UnityEngine.InputSystem;
 using System.ComponentModel;
 using Unity.Services.Lobbies;
 using System.Linq;
+using Unity.Services.Core;
 
 public class TextChatManager : MonoBehaviour
 {
@@ -28,6 +29,7 @@ public class TextChatManager : MonoBehaviour
     private const int MaxMessageCount = 50;
     private readonly Queue<GameObject> messageQueue = new Queue<GameObject>();
     private CurrentLobby _currentLobby;
+    private string lastKnownTeam = null;
     private Player LocalPlayer => _currentLobby.currentLobby?.Players?.Find(p => p.Id == AuthenticationService.Instance.PlayerId);
 
     void Awake()
@@ -39,6 +41,11 @@ public class TextChatManager : MonoBehaviour
     async void Start()
     {
         _currentLobby = CurrentLobby.Instance;
+
+        if (!UnityServices.State.Equals(ServicesInitializationState.Initialized))
+        {
+            await UnityServices.InitializeAsync();
+        }
 
         await VivoxService.Instance.InitializeAsync();
 
@@ -67,9 +74,30 @@ public class TextChatManager : MonoBehaviour
             Debug.Log("Enter basildi, mesaj gönderiliyor...");
             SendMessageAsync();
         }
+
+        // Takım değişimini kontrol et
+        var currentTeam = LocalPlayer?.Data?.TryGetValue("team", out var teamData) == true ? teamData.Value : "none";
+
+        if (currentTeam != lastKnownTeam && chanelName.options[chanelName.value].text == "Team")
+        {
+            Debug.Log($"Takim değişti: {lastKnownTeam} -> {currentTeam}");
+            lastKnownTeam = currentTeam;
+            HandleTeamChange(currentTeam);
+        }
+        else
+        {
+            lastKnownTeam = currentTeam;
+        }
     }
     async void SubscribeVivoxChannel()
     {
+
+        if (_currentLobby?.currentLobby == null)
+        {
+            Debug.LogWarning("Vivox: currentLobby henüz atanmadı.");
+            return;
+        }
+
         lobbyId = _currentLobby.currentLobby.Id;
         if (string.IsNullOrEmpty(lobbyId))
         {
@@ -153,10 +181,27 @@ public class TextChatManager : MonoBehaviour
     }
     public async void QuitChatChannelAsync()
     {
-        string channelToLeave = tempChanelName;
-        sendMessageAction.Dispose();
-        await VivoxService.Instance.LeaveChannelAsync(channelToLeave);
-        await VivoxService.Instance.LogoutAsync();
+        try
+        {
+            sendMessageAction?.Dispose();
+
+            if (!string.IsNullOrEmpty(tempChanelName) && VivoxService.Instance != null)
+            {
+                if (VivoxService.Instance.ActiveChannels.Any(c => c.Key == tempChanelName))
+                {
+                    await VivoxService.Instance.LeaveChannelAsync(tempChanelName);
+                }
+            }
+
+            if (VivoxService.Instance != null)
+            {
+                await VivoxService.Instance.LogoutAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"QuitChatChannelAsync hata: {ex.Message}");
+        }
     }
     void ScrollToBottom()
     {
@@ -164,7 +209,7 @@ public class TextChatManager : MonoBehaviour
         scrollRect.verticalNormalizedPosition = 0f;
     }
     private void DisplayMessage(string sender, string messageText, DateTime time, string chanelName, bool fromSelf)
-    { 
+    {
         GameObject newMessageGO = Instantiate(textMessagePrefab, chatContentParent);
         TextMeshProUGUI messageTextUI = newMessageGO.GetComponent<TextMeshProUGUI>();
 
@@ -239,6 +284,7 @@ public class TextChatManager : MonoBehaviour
         if (VivoxService.Instance.ActiveChannels.Any(c => c.Key == tempChanelName))
         {
             Debug.Log($"Zaten {tempChanelName} kanalina bağlisin.");
+            DisplayMessage("System", $"[Info] Zaten {tempChanelName} kanalina Bağlisin.", DateTime.Now, tempChanelName, false);
             return; // Aynı kanalsa tekrar bağlanma
         }
 
@@ -249,5 +295,37 @@ public class TextChatManager : MonoBehaviour
 
         // Chat ekranına bilgi mesajı ekle
         DisplayMessage("System", $"[Info] Changed to channel: {tempChanelName}", DateTime.Now, tempChanelName, false);
+    }
+    private async void HandleTeamChange(string newTeam)
+    {
+        try
+        {
+            // Mevcut kanaldan çık
+            if (!string.IsNullOrEmpty(tempChanelName) && VivoxService.Instance.ActiveChannels.Any(c => c.Key == tempChanelName))
+            {
+                await VivoxService.Instance.LeaveChannelAsync(tempChanelName);
+                Debug.Log($"Eski kanaldan çikildi: {tempChanelName}");
+            }
+
+            // Yeni kanal ismini ayarla
+            if (newTeam == "none")
+            {
+                tempChanelName = "All";
+            }
+            else
+            {
+                tempChanelName = newTeam;
+            }
+
+            // Yeni kanala gir
+            await VivoxService.Instance.JoinGroupChannelAsync(tempChanelName, ChatCapability.TextOnly);
+            Debug.Log($"Yeni takim kanalina bağlanildi: {tempChanelName}");
+
+            DisplayMessage("System", $"[Info] Switched to channel: {tempChanelName}", DateTime.Now, tempChanelName, false);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"Takim kanal değişiminde hata: {ex.Message}");
+        }
     }
 }

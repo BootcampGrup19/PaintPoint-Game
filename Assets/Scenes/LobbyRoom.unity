@@ -11447,7 +11447,6 @@ MonoBehaviour:
   playerInfoPrefab: {fileID: 5071619995171099914, guid: 076ef0f242d9415499c9fdebda2bfbe2, type: 3}
   startReadyButton: {fileID: 434964657}
   startReadyButtonText: {fileID: 684050785}
-  playerPrefab: {fileID: 6868858680571278620}
 --- !u!114 &1752736371
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13634,11 +13633,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bab02ea58d56ee64d834f0b531e6a03a, type: 3}
---- !u!1 &6868858680571278620 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8583259210489463119, guid: bab02ea58d56ee64d834f0b531e6a03a, type: 3}
-  m_PrefabInstance: {fileID: 6868858680571278619}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
