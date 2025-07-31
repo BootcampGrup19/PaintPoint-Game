@@ -5,7 +5,7 @@ using DG.Tweening;
 
 public class GameManager : MonoBehaviour
 {
-    public TextMeshProUGUI timerText, countTxt; // UI'daki TMP Text referansý
+    public TextMeshProUGUI timerText, countTxt; // UI'daki TMP Text referansï¿½
     public float remainingTime = 90f; // 1:30 -> 90 saniye
 
     private bool timerRunning = false;
@@ -90,7 +90,7 @@ public class GameManager : MonoBehaviour
 
     void TimerFinished()
     {
-        Debug.Log("Süre bitti!");
-        // Buraya süre bitince ne olacak onu yaz
+        Debug.Log("Sï¿½re bitti!");
+        // Buraya sï¿½re bitince ne olacak onu yaz
     }
 }
