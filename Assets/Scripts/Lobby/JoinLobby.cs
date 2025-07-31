@@ -11,6 +11,35 @@ public class JoinLobby : MonoBehaviour
     public TMP_InputField lobbyCode;
     public TMP_InputField password;
 
+<<<<<<< HEAD
+=======
+    void OnEnable(){
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    void OnDisable(){
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    void OnSceneLoaded(Scene s, LoadSceneMode mode)
+    {
+        if (s.name == "LobbyBrowserScene")
+        {
+            lobbyCode = GameObject.Find("LobbyJoinCodeInputField").GetComponent<TMP_InputField>();
+            password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
+            quickJoinButton = GameObject.Find("QuickJoinButton").GetComponent<Button>();
+            joinButton = GameObject.Find("JoinButton").GetComponent<Button>();
+
+            quickJoinButton.onClick.RemoveAllListeners();
+            joinButton.onClick.RemoveAllListeners();
+            quickJoinButton.onClick.AddListener(QuickJoinMethod);
+            joinButton.onClick.AddListener(JoinLobbyWithLobbyCode);
+        }
+    }
+    private void Start()
+    {
+        _currentLobby = CurrentLobby.Instance;
+        playerName = AuthenticationService.Instance.PlayerName;
+    }
+>>>>>>> parent of 548f87e (Kullanıcı Adı Arayüzü tasarımı gerçekleştirildi)
     public async void JoinLobbyWithLobbyCode()
     {
         var code = lobbyCode.text;

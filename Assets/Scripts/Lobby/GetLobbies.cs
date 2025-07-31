@@ -12,6 +12,7 @@ public class GetLobbies : MonoBehaviour
 {
     public GameObject lobbyRowPrefab;
     public GameObject rowContainer;
+<<<<<<< HEAD
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     async void Start()
     {
@@ -25,6 +26,52 @@ public class GetLobbies : MonoBehaviour
 
     }
 
+=======
+    public Button lobbiesButton;
+    public Button refreshButton;
+    private readonly HashSet<string> _existingLobbyIds = new HashSet<string>();
+
+    void OnEnable(){
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    void OnDisable(){
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    void OnSceneLoaded(Scene s, LoadSceneMode mode)
+    {
+        if (s.name == "LobbyBrowserScene")
+        {
+            rowContainer = GameObject.Find("PlayerContent");
+            lobbiesButton = GameObject.Find("Lobbies").GetComponent<Button>();
+            refreshButton = GameObject.Find("RefreshButton").GetComponent<Button>();
+
+            lobbiesButton.onClick.RemoveAllListeners();
+            refreshButton.onClick.RemoveAllListeners();
+            lobbiesButton.onClick.AddListener(GetLobbiesTest);
+            refreshButton.onClick.AddListener(GetLobbiesTest);
+        }
+    }
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    async void Awake()
+    {
+        await UnityServices.InitializeAsync();
+
+        if (!AuthenticationService.Instance.IsSignedIn)
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        }
+
+        if (string.IsNullOrEmpty(AuthenticationService.Instance.PlayerName))
+        {
+            string randomName = $"Player_{UnityEngine.Random.Range(1000, 9999)}";
+            await AuthenticationService.Instance.UpdatePlayerNameAsync(randomName);
+        }
+        else
+        {
+            Debug.Log("Existing player name: " + AuthenticationService.Instance.PlayerName);
+        }
+    }
+>>>>>>> parent of 548f87e (Kullanıcı Adı Arayüzü tasarımı gerçekleştirildi)
     public async void GetLobbiesTest()
     {
         ClearContainer();
