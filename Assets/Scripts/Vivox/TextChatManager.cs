@@ -11,10 +11,7 @@ using UnityEngine.InputSystem;
 using System.ComponentModel;
 using Unity.Services.Lobbies;
 using System.Linq;
-<<<<<<< HEAD
-=======
 using Unity.Services.Core;
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
 
 public class TextChatManager : MonoBehaviour
 {
@@ -32,10 +29,7 @@ public class TextChatManager : MonoBehaviour
     private const int MaxMessageCount = 50;
     private readonly Queue<GameObject> messageQueue = new Queue<GameObject>();
     private CurrentLobby _currentLobby;
-<<<<<<< HEAD
-=======
     private string lastKnownTeam = null;
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
     private Player LocalPlayer => _currentLobby.currentLobby?.Players?.Find(p => p.Id == AuthenticationService.Instance.PlayerId);
 
     void Awake()
@@ -48,14 +42,11 @@ public class TextChatManager : MonoBehaviour
     {
         _currentLobby = CurrentLobby.Instance;
 
-<<<<<<< HEAD
-=======
         if (!UnityServices.State.Equals(ServicesInitializationState.Initialized))
         {
             await UnityServices.InitializeAsync();
         }
 
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
         await VivoxService.Instance.InitializeAsync();
 
         LoginOptions options = new LoginOptions();
@@ -83,11 +74,6 @@ public class TextChatManager : MonoBehaviour
             Debug.Log("Enter basildi, mesaj gönderiliyor...");
             SendMessageAsync();
         }
-<<<<<<< HEAD
-    }
-    async void SubscribeVivoxChannel()
-    {
-=======
 
         // Takım değişimini kontrol et
         var currentTeam = LocalPlayer?.Data?.TryGetValue("team", out var teamData) == true ? teamData.Value : "none";
@@ -112,7 +98,6 @@ public class TextChatManager : MonoBehaviour
             return;
         }
 
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
         lobbyId = _currentLobby.currentLobby.Id;
         if (string.IsNullOrEmpty(lobbyId))
         {
@@ -141,14 +126,11 @@ public class TextChatManager : MonoBehaviour
             tempChanelName = chanelName.options[chanelName.value].text;
         }
 
-<<<<<<< HEAD
-=======
         if (VivoxService.Instance.ActiveChannels.TryGetValue(tempChanelName, out var existingChannel))
         {
             await VivoxService.Instance.LeaveChannelAsync(tempChanelName);
         }
 
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
         // Join kanal
         await VivoxService.Instance.JoinGroupChannelAsync(tempChanelName, ChatCapability.TextOnly);
 
@@ -204,12 +186,6 @@ public class TextChatManager : MonoBehaviour
     }
     public async void QuitChatChannelAsync()
     {
-<<<<<<< HEAD
-        string channelToLeave = tempChanelName;
-        sendMessageAction.Dispose();
-        await VivoxService.Instance.LeaveChannelAsync(channelToLeave);
-        await VivoxService.Instance.LogoutAsync();
-=======
         try
         {
             sendMessageAction?.Dispose();
@@ -238,7 +214,6 @@ public class TextChatManager : MonoBehaviour
         {
             Debug.LogError($"QuitChatChannelAsync hata: {ex.Message}");
         }
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
     }
     void ScrollToBottom()
     {
@@ -246,13 +221,9 @@ public class TextChatManager : MonoBehaviour
         scrollRect.verticalNormalizedPosition = 0f;
     }
     private void DisplayMessage(string sender, string messageText, DateTime time, string chanelName, bool fromSelf)
-<<<<<<< HEAD
-    { 
-=======
     {
         if (this == null || gameObject == null || !gameObject.activeInHierarchy) return;
 
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
         GameObject newMessageGO = Instantiate(textMessagePrefab, chatContentParent);
         TextMeshProUGUI messageTextUI = newMessageGO.GetComponent<TextMeshProUGUI>();
 
@@ -327,10 +298,7 @@ public class TextChatManager : MonoBehaviour
         if (VivoxService.Instance.ActiveChannels.Any(c => c.Key == tempChanelName))
         {
             Debug.Log($"Zaten {tempChanelName} kanalina bağlisin.");
-<<<<<<< HEAD
-=======
             DisplayMessage("System", $"[Info] Zaten {tempChanelName} kanalina Bağlisin.", DateTime.Now, tempChanelName, false);
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
             return; // Aynı kanalsa tekrar bağlanma
         }
 
@@ -342,8 +310,6 @@ public class TextChatManager : MonoBehaviour
         // Chat ekranına bilgi mesajı ekle
         DisplayMessage("System", $"[Info] Changed to channel: {tempChanelName}", DateTime.Now, tempChanelName, false);
     }
-<<<<<<< HEAD
-=======
     private async void HandleTeamChange(string newTeam)
     {
         try
@@ -376,5 +342,4 @@ public class TextChatManager : MonoBehaviour
             Debug.LogWarning($"Takim kanal değişiminde hata: {ex.Message}");
         }
     }
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
 }
