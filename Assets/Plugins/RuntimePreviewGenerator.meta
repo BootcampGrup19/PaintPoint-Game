@@ -1,8 +1,14 @@
 fileFormatVersion: 2
 guid: 40db9afa818a64e4ebbcb627a86f7236
 folderAsset: yes
+<<<<<<< HEAD
 DefaultImporter:
   externalObjects: {}
+=======
+timeCreated: 1563638834
+licenseType: Store
+DefaultImporter:
+>>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
   userData: 
   assetBundleName: 
   assetBundleVariant: 

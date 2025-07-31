@@ -8,6 +8,7 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class CreateALobby : MonoBehaviour
 {
@@ -15,9 +16,14 @@ public class CreateALobby : MonoBehaviour
     public TMP_Dropdown teamSize;
     public TMP_InputField lobbyPassword;
     public TMP_InputField password;
+    public Button createLobbyButton;
+    private Coroutine heartbeatCoroutine;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
     void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -31,12 +37,28 @@ public class CreateALobby : MonoBehaviour
         if (s.name == "LobbyBrowserScene")
         {
             StartCoroutine(WaitForInputField());
+<<<<<<< HEAD
 
             password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
+=======
+>>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
         }
     }
     IEnumerator WaitForInputField()
     {
+<<<<<<< HEAD
+=======
+        GameObject controller = null;
+
+        while (controller == null)
+        {
+            controller = GameObject.Find("LobbyBrowserScenePanel");
+            yield return null; // her frame yeniden dener
+        }
+
+        password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
+
+>>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
         GameObject inputObj = null;
 
         while (inputObj == null)
@@ -53,7 +75,10 @@ public class CreateALobby : MonoBehaviour
         createLobbyButton.onClick.RemoveAllListeners();
         createLobbyButton.onClick.AddListener(CreateLobbyMethod);
     }
+<<<<<<< HEAD
 >>>>>>> parent of 548f87e (Kullanıcı Adı Arayüzü tasarımı gerçekleştirildi)
+=======
+>>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
     public async void CreateLobbyMethod()
     {
         string lobbyName = LobbyName.text;
@@ -63,16 +88,30 @@ public class CreateALobby : MonoBehaviour
         {
             {"password", new DataObject(
                 DataObject.VisibilityOptions.Member,
-                value: lobbyPassword.text)}
+                value: lobbyPassword.text)},
+            {"maxplayers",
+                new DataObject(DataObject.VisibilityOptions.Private,
+                value: Convert.ToString(maxPlayers))},
+            {"status",
+                new DataObject(DataObject.VisibilityOptions.Public,
+                value: "open",
+                index: DataObject.IndexOptions.S1)}
         };
-        options.Player = new Player(AuthenticationService.Instance.PlayerId);
+        options.Player = new Player(AuthenticationService.Instance.PlayerId)
+        {
+            Data = new Dictionary<string, PlayerDataObject>
+            {
+                { "playerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, AuthenticationService.Instance.PlayerName) },
+                { "team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, "none") }
+            }
+        };
 
         Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
-        DontDestroyOnLoad(this);
-        GetComponent<CurrentLobby>().currentLobby = lobby;
+
+        CurrentLobby.Instance.currentLobby = lobby;
         Debug.Log("Lobby created");
 
-        StartCoroutine(HearthBeatLobbyCorootine(lobby.Id, 15f));
+        heartbeatCoroutine = StartCoroutine(HearthBeatLobbyCorootine(lobby.Id, 15f));
         SceneManager.LoadScene("LobbyRoom");
     }
 
@@ -84,6 +123,14 @@ public class CreateALobby : MonoBehaviour
         {
             LobbyService.Instance.SendHeartbeatPingAsync(lobbyID);
             yield return delay;
+        }
+    }
+    public void StopHeartbeatCoroutine()
+    {
+        if (heartbeatCoroutine != null)
+        {
+            StopCoroutine(heartbeatCoroutine);
+            heartbeatCoroutine = null;
         }
     }
 }
