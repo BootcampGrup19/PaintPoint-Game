@@ -60,7 +60,7 @@ namespace Unity.FPS.Gameplay
                     return;
 
                 float percent = PaintManager.instance.CalculatePaintedPercentage(this);
-                Debug.Log("Boyanma Oraný: " + percent + "%");
+                Debug.Log("Boyanma Oranï¿½: " + percent + "%");
 
             }
 
@@ -69,7 +69,7 @@ namespace Unity.FPS.Gameplay
                 var ratios = PaintManager.instance.CalculatePaintedPercentageByColor(this);
                 foreach (var kvp in ratios)
                 {
-                    Debug.Log($"{kvp.Key} ile boyanma oraný: {kvp.Value}%");
+                    Debug.Log($"{kvp.Key} ile boyanma oranï¿½: {kvp.Value}%");
                 }
             }
         }

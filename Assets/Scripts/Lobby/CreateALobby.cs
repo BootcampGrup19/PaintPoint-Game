@@ -10,64 +10,66 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class CreateALobby : MonoBehaviour
+namespace Unity.BizimKodlar
 {
-    public TMP_InputField LobbyName;
-    public TMP_Dropdown teamSize;
-    public TMP_InputField lobbyPassword;
-    public TMP_InputField password;
-    public Button createLobbyButton;
-    private Coroutine heartbeatCoroutine;
+    public class CreateALobby : MonoBehaviour
+    {
+        public TMP_InputField LobbyName;
+        public TMP_Dropdown teamSize;
+        public TMP_InputField lobbyPassword;
+        public TMP_InputField password;
+        public Button createLobbyButton;
+        private Coroutine heartbeatCoroutine;
 
-    void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-    void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-    void OnSceneLoaded(Scene s, LoadSceneMode mode)
-    {
-        if (s.name == "LobbyBrowserScene")
+        void OnEnable()
         {
-            StartCoroutine(WaitForInputField());
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
-    }
-    IEnumerator WaitForInputField()
-    {
-        GameObject controller = null;
-
-        while (controller == null)
+        void OnDisable()
         {
-            controller = GameObject.Find("LobbyBrowserScenePanel");
-            yield return null; // her frame yeniden dener
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
-
-        password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
-
-        GameObject inputObj = null;
-
-        while (inputObj == null)
+        void OnSceneLoaded(Scene s, LoadSceneMode mode)
         {
-            inputObj = GameObject.Find("LobbyNameInputField");
-            yield return null; // her frame yeniden dener
+            if (s.name == "LobbyBrowserScene")
+            {
+                StartCoroutine(WaitForInputField());
+            }
         }
+        IEnumerator WaitForInputField()
+        {
+            GameObject controller = null;
 
-        LobbyName = inputObj.GetComponent<TMP_InputField>();
-        teamSize = GameObject.Find("TeamSizeDropdown").GetComponent<TMP_Dropdown>();
-        lobbyPassword = GameObject.Find("PasswordInputField").GetComponent<TMP_InputField>();
-        createLobbyButton = GameObject.Find("CreateLobbyButton").GetComponent<Button>();
+            while (controller == null)
+            {
+                controller = GameObject.Find("LobbyBrowserScenePanel");
+                yield return null; // her frame yeniden dener
+            }
 
-        createLobbyButton.onClick.RemoveAllListeners();
-        createLobbyButton.onClick.AddListener(CreateLobbyMethod);
-    }
-    public async void CreateLobbyMethod()
-    {
-        string lobbyName = LobbyName.text;
-        int maxPlayers = Convert.ToInt32(teamSize.options[teamSize.value].text);
-        CreateLobbyOptions options = new CreateLobbyOptions();
-        options.Data = new Dictionary<string, DataObject>()
+            password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
+
+            GameObject inputObj = null;
+
+            while (inputObj == null)
+            {
+                inputObj = GameObject.Find("LobbyNameInputField");
+                yield return null; // her frame yeniden dener
+            }
+
+            LobbyName = inputObj.GetComponent<TMP_InputField>();
+            teamSize = GameObject.Find("TeamSizeDropdown").GetComponent<TMP_Dropdown>();
+            lobbyPassword = GameObject.Find("PasswordInputField").GetComponent<TMP_InputField>();
+            createLobbyButton = GameObject.Find("CreateLobbyButton").GetComponent<Button>();
+
+            createLobbyButton.onClick.RemoveAllListeners();
+            createLobbyButton.onClick.AddListener(CreateLobbyMethod);
+        }
+        public async void CreateLobbyMethod()
+        {
+            string lobbyName = LobbyName.text;
+            int maxPlayers = Convert.ToInt32(teamSize.options[teamSize.value].text);
+            CreateLobbyOptions options = new CreateLobbyOptions();
+            options.Data = new Dictionary<string, DataObject>()
         {
             {"password", new DataObject(
                 DataObject.VisibilityOptions.Member,
@@ -80,40 +82,41 @@ public class CreateALobby : MonoBehaviour
                 value: "open",
                 index: DataObject.IndexOptions.S1)}
         };
-        options.Player = new Player(AuthenticationService.Instance.PlayerId)
-        {
-            Data = new Dictionary<string, PlayerDataObject>
+            options.Player = new Player(AuthenticationService.Instance.PlayerId)
+            {
+                Data = new Dictionary<string, PlayerDataObject>
             {
                 { "playerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, AuthenticationService.Instance.PlayerName) },
                 { "team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, "none") }
             }
-        };
+            };
 
-        Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
+            Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
 
-        CurrentLobby.Instance.currentLobby = lobby;
-        Debug.Log("Lobby created");
+            CurrentLobby.Instance.currentLobby = lobby;
+            Debug.Log("Lobby created");
 
-        heartbeatCoroutine = StartCoroutine(HearthBeatLobbyCorootine(lobby.Id, 15f));
-        SceneManager.LoadScene("LobbyRoom");
-    }
-
-    IEnumerator HearthBeatLobbyCorootine(string lobbyID, float waitTimeSeconds)
-    {
-        var delay = new WaitForSeconds(waitTimeSeconds);
-
-        while (true)
-        {
-            LobbyService.Instance.SendHeartbeatPingAsync(lobbyID);
-            yield return delay;
+            heartbeatCoroutine = StartCoroutine(HearthBeatLobbyCorootine(lobby.Id, 15f));
+            SceneManager.LoadScene("LobbyRoom");
         }
-    }
-    public void StopHeartbeatCoroutine()
-    {
-        if (heartbeatCoroutine != null)
+
+        IEnumerator HearthBeatLobbyCorootine(string lobbyID, float waitTimeSeconds)
         {
-            StopCoroutine(heartbeatCoroutine);
-            heartbeatCoroutine = null;
+            var delay = new WaitForSeconds(waitTimeSeconds);
+
+            while (true)
+            {
+                LobbyService.Instance.SendHeartbeatPingAsync(lobbyID);
+                yield return delay;
+            }
+        }
+        public void StopHeartbeatCoroutine()
+        {
+            if (heartbeatCoroutine != null)
+            {
+                StopCoroutine(heartbeatCoroutine);
+                heartbeatCoroutine = null;
+            }
         }
     }
 }

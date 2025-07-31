@@ -9,126 +9,129 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-
-public class GetLobbies : MonoBehaviour
+namespace Unity.BizimKodlar
 {
-    public GameObject lobbyRowPrefab;
-    public GameObject rowContainer;
-    public Button lobbiesButton;
-    public Button refreshButton;
-    public GameObject playerNamePanel;
-    public GameObject lobbyBrowserPanel;
-    public TMP_InputField playerNameInput;
-    public Button playerNameButton;
-    private readonly HashSet<string> _existingLobbyIds = new HashSet<string>();
-
-    void OnEnable(){
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-    void OnDisable(){
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-    async void OnSceneLoaded(Scene s, LoadSceneMode mode)
+    public class GetLobbies : MonoBehaviour
     {
-        if (s.name == "LobbyBrowserScene")
+        public GameObject lobbyRowPrefab;
+        public GameObject rowContainer;
+        public Button lobbiesButton;
+        public Button refreshButton;
+        public GameObject playerNamePanel;
+        public GameObject lobbyBrowserPanel;
+        public TMP_InputField playerNameInput;
+        public Button playerNameButton;
+        private readonly HashSet<string> _existingLobbyIds = new HashSet<string>();
+
+        void OnEnable()
         {
-            if (UnityServices.State != ServicesInitializationState.Initialized)
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+        void OnDisable()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+        async void OnSceneLoaded(Scene s, LoadSceneMode mode)
+        {
+            if (s.name == "LobbyBrowserScene")
             {
-                await UnityServices.InitializeAsync();
+                if (UnityServices.State != ServicesInitializationState.Initialized)
+                {
+                    await UnityServices.InitializeAsync();
+                }
+
+                if (!AuthenticationService.Instance.IsSignedIn)
+                {
+                    await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                }
+
+                // Yeni UI referanslarını bul:
+                playerNamePanel = GameObject.Find("PlayerNamePanel");
+                lobbyBrowserPanel = GameObject.Find("LobbyBrowserScenePanel");
+                //playerNameInput = GameObject.Find("PlayerNameInputField").GetComponent<TMP_InputField>();
+                //playerNameButton = GameObject.Find("PlayerNameButton").GetComponent<Button>();
+
+                HandlePlayerNameLogic();
+                StartCoroutine(WaitForInputField());
+            }
+        }
+        IEnumerator WaitForInputField()
+        {
+            GameObject inputObj = null;
+
+            while (inputObj == null)
+            {
+                inputObj = GameObject.Find("LobbyBrowserScenePanel");
+                yield return null; // her frame yeniden dener
             }
 
-            if (!AuthenticationService.Instance.IsSignedIn)
+            rowContainer = GameObject.Find("PlayerContent");
+            lobbiesButton = GameObject.Find("Lobbies").GetComponent<Button>();
+            refreshButton = GameObject.Find("RefreshButton").GetComponent<Button>();
+
+            lobbiesButton.onClick.RemoveAllListeners();
+            refreshButton.onClick.RemoveAllListeners();
+            lobbiesButton.onClick.AddListener(GetLobbiesTest);
+            refreshButton.onClick.AddListener(GetLobbiesTest);
+        }
+        private void HandlePlayerNameLogic()
+        {
+            // Eğer daha önce isim atanmışsa PlayerNamePanel'i gösterme
+            if (PlayerPrefs.GetInt("isCustomNameSet", 0) == 1)
             {
-                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                Debug.Log("Player has set a custom name previously: " + AuthenticationService.Instance.PlayerName);
+
+                playerNamePanel.SetActive(false);
+                lobbyBrowserPanel.SetActive(true);
+                GetLobbiesTest();
+            }
+            else
+            {
+                Debug.Log("Prompting for custom player name.");
+                playerNamePanel.SetActive(true);
+                lobbyBrowserPanel.SetActive(false);
+            }
+        }
+        public async void SetPlayerNameAndShowLobby()
+        {
+            string inputName = playerNameInput.text.Trim();
+
+            if (string.IsNullOrEmpty(inputName))
+            {
+                Debug.LogWarning("Player name input is empty!");
+                return;
             }
 
-            // Yeni UI referanslarını bul:
-            playerNamePanel = GameObject.Find("PlayerNamePanel");
-            lobbyBrowserPanel = GameObject.Find("LobbyBrowserScenePanel");
-            //playerNameInput = GameObject.Find("PlayerNameInputField").GetComponent<TMP_InputField>();
-            //playerNameButton = GameObject.Find("PlayerNameButton").GetComponent<Button>();
+            try
+            {
+                await AuthenticationService.Instance.UpdatePlayerNameAsync(inputName);
+                Debug.Log("Player name set to: " + inputName);
 
-            HandlePlayerNameLogic();
-            StartCoroutine(WaitForInputField());
+                PlayerPrefs.SetInt("isCustomNameSet", 1);
+                PlayerPrefs.Save();
+
+                playerNamePanel.SetActive(false);
+                lobbyBrowserPanel.SetActive(true);
+
+                GetLobbiesTest(); // Lobi listesini getir
+            }
+            catch (AuthenticationException ex)
+            {
+                Debug.LogError("Failed to set player name: " + ex.Message);
+            }
         }
-    }
-    IEnumerator WaitForInputField()
-    {
-        GameObject inputObj = null;
-
-        while (inputObj == null)
+        public async void GetLobbiesTest()
         {
-            inputObj = GameObject.Find("LobbyBrowserScenePanel");
-            yield return null; // her frame yeniden dener
-        }
+            ClearContainer();
+            _existingLobbyIds.Clear();
 
-        rowContainer = GameObject.Find("PlayerContent");
-        lobbiesButton = GameObject.Find("Lobbies").GetComponent<Button>();
-        refreshButton = GameObject.Find("RefreshButton").GetComponent<Button>();
+            try
+            {
+                QueryLobbiesOptions options = new();
+                Debug.LogWarning("QueryLobbiesTest");
+                options.Count = 25;
 
-        lobbiesButton.onClick.RemoveAllListeners();
-        refreshButton.onClick.RemoveAllListeners();
-        lobbiesButton.onClick.AddListener(GetLobbiesTest);
-        refreshButton.onClick.AddListener(GetLobbiesTest);           
-    }
-    private void HandlePlayerNameLogic()
-    {
-        // Eğer daha önce isim atanmışsa PlayerNamePanel'i gösterme
-        if (PlayerPrefs.GetInt("isCustomNameSet", 0) == 1)
-        {
-            Debug.Log("Player has set a custom name previously: " + AuthenticationService.Instance.PlayerName);
-
-            playerNamePanel.SetActive(false);
-            lobbyBrowserPanel.SetActive(true);
-            GetLobbiesTest();
-        }
-        else
-        {
-            Debug.Log("Prompting for custom player name.");
-            playerNamePanel.SetActive(true);
-            lobbyBrowserPanel.SetActive(false);
-        }
-    }
-    public async void SetPlayerNameAndShowLobby()
-    {
-        string inputName = playerNameInput.text.Trim();
-
-        if (string.IsNullOrEmpty(inputName))
-        {
-            Debug.LogWarning("Player name input is empty!");
-            return;
-        }
-
-        try
-        {
-            await AuthenticationService.Instance.UpdatePlayerNameAsync(inputName);
-            Debug.Log("Player name set to: " + inputName);
-
-            PlayerPrefs.SetInt("isCustomNameSet", 1);
-            PlayerPrefs.Save();
-
-            playerNamePanel.SetActive(false);
-            lobbyBrowserPanel.SetActive(true);
-
-            GetLobbiesTest(); // Lobi listesini getir
-        }
-        catch (AuthenticationException ex)
-        {
-            Debug.LogError("Failed to set player name: " + ex.Message);
-        }
-    }
-    public async void GetLobbiesTest()
-    {
-        ClearContainer();
-        _existingLobbyIds.Clear();
-
-        try
-        {
-            QueryLobbiesOptions options = new();
-            Debug.LogWarning("QueryLobbiesTest");
-            options.Count = 25;
-
-            options.Filters = new List<QueryFilter>()
+                options.Filters = new List<QueryFilter>()
             {
                 new QueryFilter(
                     field: QueryFilter.FieldOptions.S1,
@@ -140,76 +143,77 @@ public class GetLobbies : MonoBehaviour
                     value: "0")
             };
 
-            options.Order = new List<QueryOrder>()
+                options.Order = new List<QueryOrder>()
             {
                 new QueryOrder(
                     asc: false,
                     field: QueryOrder.FieldOptions.Created)
             };
 
-            QueryResponse lobbies = await LobbyService.Instance.QueryLobbiesAsync(options);
-            Debug.LogWarning("Get Lobbies Done! Count::" + lobbies.Results.Count);
+                QueryResponse lobbies = await LobbyService.Instance.QueryLobbiesAsync(options);
+                Debug.LogWarning("Get Lobbies Done! Count::" + lobbies.Results.Count);
 
-            foreach (Lobby bulunanLobby in lobbies.Results)
+                foreach (Lobby bulunanLobby in lobbies.Results)
+                {
+                    if (_existingLobbyIds.Contains(bulunanLobby.Id)) continue;
+
+                    Debug.Log("Lobby Name: " + bulunanLobby.Name + "\n" +
+                    "Time for Created Lobby: " + bulunanLobby.Created + "\n" +
+                    "Lobby Code: " + bulunanLobby.LobbyCode);
+
+                    _existingLobbyIds.Add(bulunanLobby.Id);
+                    CreateLobbyRow(bulunanLobby);
+                }
+            }
+            catch (LobbyServiceException e)
             {
-                if (_existingLobbyIds.Contains(bulunanLobby.Id)) continue;
 
-                Debug.Log("Lobby Name: " + bulunanLobby.Name + "\n" +
-                "Time for Created Lobby: " + bulunanLobby.Created + "\n" +
-                "Lobby Code: " + bulunanLobby.LobbyCode);
-
-                _existingLobbyIds.Add(bulunanLobby.Id);
-                CreateLobbyRow(bulunanLobby);
+                Debug.Log(e);
             }
         }
-        catch (LobbyServiceException e)
+        private void CreateLobbyRow(Lobby lobby)
         {
+            GameObject row = Instantiate(lobbyRowPrefab, rowContainer.transform);
+            row.name = lobby.Name;
 
-            Debug.Log(e);
+            row.transform.Find("LobbyNameText").GetComponent<TextMeshProUGUI>().text = lobby.Name;
+            row.transform.Find("OwnerText").GetComponent<TextMeshProUGUI>().text = lobby.Players.Find(p => p.Id == lobby.HostId)?.Data["playerName"].Value ?? "Unknown";
+            row.transform.Find("PlayerCountText").GetComponent<TextMeshProUGUI>().text = lobby.Players.Count + "/" + lobby.MaxPlayers;
+
+            var rectTransform = row.GetComponent<RectTransform>();
+            rectTransform.SetParent(rowContainer.transform);
+
+            Button joinButton = row.transform.Find("JoinButton").GetComponent<Button>();
+            joinButton.onClick.AddListener(() => Lobby_OnClick(lobby));
         }
-    }
-    private void CreateLobbyRow(Lobby lobby)
-    {
-        GameObject row = Instantiate(lobbyRowPrefab, rowContainer.transform);
-        row.name = lobby.Name;
-
-        row.transform.Find("LobbyNameText").GetComponent<TextMeshProUGUI>().text = lobby.Name;
-        row.transform.Find("OwnerText").GetComponent<TextMeshProUGUI>().text = lobby.Players.Find(p => p.Id == lobby.HostId)?.Data["playerName"].Value ?? "Unknown";
-        row.transform.Find("PlayerCountText").GetComponent<TextMeshProUGUI>().text = lobby.Players.Count + "/" + lobby.MaxPlayers;
-
-        var rectTransform = row.GetComponent<RectTransform>();
-        rectTransform.SetParent(rowContainer.transform);
-        
-        Button joinButton = row.transform.Find("JoinButton").GetComponent<Button>();
-        joinButton.onClick.AddListener(() => Lobby_OnClick(lobby));
-    }
-    public void Lobby_OnClick(Lobby lobby)
-    {
-        try
+        public void Lobby_OnClick(Lobby lobby)
         {
-            Debug.Log("Clicked Lobby " + lobby.Name);
-
-            // JoinLobbyWithLobbyId çağrılmadan önce kontrol:
-            if (CurrentLobby.Instance == null)
+            try
             {
-                Debug.LogError("CurrentLobby bulunamadi. LobbyManager objesi eksik olabilir.");
+                Debug.Log("Clicked Lobby " + lobby.Name);
+
+                // JoinLobbyWithLobbyId çağrılmadan önce kontrol:
+                if (CurrentLobby.Instance == null)
+                {
+                    Debug.LogError("CurrentLobby bulunamadi. LobbyManager objesi eksik olabilir.");
+                }
+
+                GetComponent<JoinLobby>().JoinLobbyWithLobbyId(lobby.Id);
             }
-
-            GetComponent<JoinLobby>().JoinLobbyWithLobbyId(lobby.Id);
-        }
-        catch(LobbyServiceException ex) when
-            (ex.Reason == LobbyExceptionReason.LobbyNotFound)
-        {
-            GetLobbiesTest();
-        }
-    }
-    private void ClearContainer()
-    {
-        if (rowContainer != null)
-        {
-            for (int i = rowContainer.transform.childCount - 1; i >= 0; i--)
+            catch (LobbyServiceException ex) when
+                (ex.Reason == LobbyExceptionReason.LobbyNotFound)
             {
-                DestroyImmediate(rowContainer.transform.GetChild(i).gameObject);
+                GetLobbiesTest();
+            }
+        }
+        private void ClearContainer()
+        {
+            if (rowContainer != null)
+            {
+                for (int i = rowContainer.transform.childCount - 1; i >= 0; i--)
+                {
+                    DestroyImmediate(rowContainer.transform.GetChild(i).gameObject);
+                }
             }
         }
     }

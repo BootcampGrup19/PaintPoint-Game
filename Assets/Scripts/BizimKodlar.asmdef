@@ -1,0 +1,30 @@
+{
+    "name": "BizimKodlar",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2bafac87e7f4b9b418d9448d219b01ab",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:1491147abca9d7d4bb7105af628b223e",
+        "GUID:5540e30183c82e84b954c033c388e06c",
+        "GUID:fe25561d224ed4743af4c60938a59d0b",
+        "GUID:e0cd26848372d4e5c891c569017e11f1",
+        "GUID:4c3f49d89436d478ea78315c03159dcc",
+        "GUID:03058786646e84a4587858e9302c3f41",
+        "GUID:6087a74f6015aae4daed9a2577a7596c",
+        "GUID:36ae44cc1707a0f42a2fcd5898aa569b",
+        "GUID:2eaad764d5d23d245b23d4438904b0ac",
+        "GUID:9c5543eabb73a6249ac07b2c065ee8b4",
+        "GUID:27b7e9efd224f064990a97ed99e4456f",
+        "GUID:269903ea973e2a64ca0fb91ee07d3625"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

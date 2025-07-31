@@ -2,29 +2,32 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class LevelLoader : MonoBehaviour
+namespace Unity.BizimKodlar
 {
-    [SerializeField]
-    private Animator animator;
-
-    public float transitionTime = .5f;
-
-    public void LoadNextLevel()
+    public class LevelLoader : MonoBehaviour
     {
-        StartCoroutine(LoadLevel(SceneManager.GetActiveScene().buildIndex + 1));
+        [SerializeField]
+        private Animator animator;
+
+        public float transitionTime = .5f;
+
+        public void LoadNextLevel()
+        {
+            StartCoroutine(LoadLevel(SceneManager.GetActiveScene().buildIndex + 1));
+        }
+
+        public void LoadLevelAtIndex(int idx)
+        {
+            StartCoroutine(LoadLevel(idx));
+        }
+
+        public IEnumerator LoadLevel(int levelIndex)
+        {
+            animator.SetTrigger("start");
+            yield return new WaitForSeconds(transitionTime);
+            SceneManager.LoadScene(levelIndex);
+        }
+
+
     }
-
-    public void LoadLevelAtIndex(int idx)
-    {
-        StartCoroutine(LoadLevel(idx));
-    }
-
-    public IEnumerator LoadLevel(int levelIndex)
-    {
-        animator.SetTrigger("start");
-        yield return new WaitForSeconds(transitionTime);
-        SceneManager.LoadScene(levelIndex);
-    }
-
-
 }

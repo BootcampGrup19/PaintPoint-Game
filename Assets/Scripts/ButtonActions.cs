@@ -2,34 +2,37 @@ using Unity.Netcode;
 using UnityEngine;
 using TMPro;
 
-public class ButtonActions : MonoBehaviour
+namespace Unity.BizimKodlar
 {
-
-    private NetworkManager networkManager;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class ButtonActions : MonoBehaviour
     {
-        networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
-    }
-    
-    public void SubmitNewPosition()
-    {
-        var playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
 
-        if (playerObject == null)
+        private NetworkManager networkManager;
+        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        void Start()
         {
-            Debug.LogWarning("Local player object not found.");
-            return;
+            networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
         }
 
-        var player = playerObject.GetComponent<PlayerMovement>();
-
-        if (player == null)
+        public void SubmitNewPosition()
         {
-            Debug.LogWarning("PlayerMovement component not found.");
-            return;
-        }
+            var playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
 
-        player.Move();
+            if (playerObject == null)
+            {
+                Debug.LogWarning("Local player object not found.");
+                return;
+            }
+
+            var player = playerObject.GetComponent<PlayerMovement>();
+
+            if (player == null)
+            {
+                Debug.LogWarning("PlayerMovement component not found.");
+                return;
+            }
+
+            player.Move();
+        }
     }
 }

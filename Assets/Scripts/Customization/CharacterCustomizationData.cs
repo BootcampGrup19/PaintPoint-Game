@@ -1,19 +1,23 @@
 using System;
 
-[Serializable]
-public class CharacterCustomizationData
+namespace Unity.BizimKodlar
 {
-    public string bodyName;
-    public string faceName;
-    public string hairName;
-    public string hatName;
-    public string accessoriesName;
-    public string glassesName;
-    public string outerwearName;
-    public string pantsName;
-    public string shoesName;
-    public string glovesName;
-    public string costumeName;
+    [Serializable]
 
-    // Daha sonra renk, aksesuar gibi alanlar da eklenebilir
+    public class CharacterCustomizationData
+    {
+        public string bodyName;
+        public string faceName;
+        public string hairName;
+        public string hatName;
+        public string accessoriesName;
+        public string glassesName;
+        public string outerwearName;
+        public string pantsName;
+        public string shoesName;
+        public string glovesName;
+        public string costumeName;
+
+        // Daha sonra renk, aksesuar gibi alanlar da eklenebilir
+    }
 }

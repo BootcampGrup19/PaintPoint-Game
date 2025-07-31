@@ -1,15 +1,17 @@
 using UnityEngine;
 using Unity.Netcode;
-
-public class NetworkTransform : NetworkBehaviour
+namespace Unity.BizimKodlar
 {
-
-    // Update is called once per frame
-    void Update()
+    public class NetworkTransform : NetworkBehaviour
     {
-        if(IsOwner && IsServer)
+
+        // Update is called once per frame
+        void Update()
         {
-            transform.RotateAround(GetComponentInParent<Transform>().position, Vector3.up, 100f*Time.deltaTime);
+            if (IsOwner && IsServer)
+            {
+                transform.RotateAround(GetComponentInParent<Transform>().position, Vector3.up, 100f * Time.deltaTime);
+            }
         }
     }
 }

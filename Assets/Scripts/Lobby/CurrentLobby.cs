@@ -2,19 +2,22 @@ using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
-public class CurrentLobby : MonoBehaviour
+namespace Unity.BizimKodlar
 {
-    public static CurrentLobby Instance { get; private set; }
-    public Lobby currentLobby { get; set; }
-
-    void Awake()
+    public class CurrentLobby : MonoBehaviour
     {
-        if (Instance != null && Instance != this)
+        public static CurrentLobby Instance { get; private set; }
+        public Lobby currentLobby { get; set; }
+
+        void Awake()
         {
-            Destroy(gameObject);               // İkinci kopyaya izin verme
-            return;
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);               // İkinci kopyaya izin verme
+                return;
+            }
+            Instance = this;
+            DontDestroyOnLoad(gameObject);         // Sahne atlayınca kalıcı
         }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);         // Sahne atlayınca kalıcı
     }
 }
