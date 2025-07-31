@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "name": "TextChatInputActions",
+    "maps": [
+        {
+            "name": "UI",
+            "id": "fdbd24db-f0a0-4341-9e9b-0f6949efc646",
+            "actions": [
+                {
+                    "name": "SendMessage",
+                    "type": "Button",
+                    "id": "71a12130-7bff-4889-ad44-5601d45ff805",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "372078cc-7c93-4748-9ac9-47f3b3126ef7",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SendMessage",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
