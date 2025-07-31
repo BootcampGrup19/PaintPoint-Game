@@ -98,6 +98,11 @@ public class TextChatManager : MonoBehaviour
             tempChanelName = chanelName.options[chanelName.value].text;
         }
 
+        if (VivoxService.Instance.ActiveChannels.TryGetValue(tempChanelName, out var existingChannel))
+        {
+            await VivoxService.Instance.LeaveChannelAsync(tempChanelName);
+        }
+
         // Join kanal
         await VivoxService.Instance.JoinGroupChannelAsync(tempChanelName, ChatCapability.TextOnly);
 
@@ -153,6 +158,13 @@ public class TextChatManager : MonoBehaviour
     }
     public async void QuitChatChannelAsync()
     {
+         if (VivoxService.Instance != null)
+        {
+            VivoxService.Instance.ChannelMessageReceived -= OnChannelMessageReceived;
+            VivoxService.Instance.ParticipantAddedToChannel -= OnParticipantAdded;
+            VivoxService.Instance.ParticipantRemovedFromChannel -= OnParticipantRemoved;
+        }
+
         string channelToLeave = tempChanelName;
         sendMessageAction.Dispose();
         await VivoxService.Instance.LeaveChannelAsync(channelToLeave);
@@ -165,6 +177,8 @@ public class TextChatManager : MonoBehaviour
     }
     private void DisplayMessage(string sender, string messageText, DateTime time, string chanelName, bool fromSelf)
     { 
+        if (this == null || gameObject == null || !gameObject.activeInHierarchy) return;
+
         GameObject newMessageGO = Instantiate(textMessagePrefab, chatContentParent);
         TextMeshProUGUI messageTextUI = newMessageGO.GetComponent<TextMeshProUGUI>();
 
@@ -239,6 +253,7 @@ public class TextChatManager : MonoBehaviour
         if (VivoxService.Instance.ActiveChannels.Any(c => c.Key == tempChanelName))
         {
             Debug.Log($"Zaten {tempChanelName} kanalina bağlisin.");
+            DisplayMessage("System", $"[Info] Zaten {tempChanelName} kanalina bağlisin.", DateTime.Now, tempChanelName, false);
             return; // Aynı kanalsa tekrar bağlanma
         }
 
