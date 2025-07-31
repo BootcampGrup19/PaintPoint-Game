@@ -11441,25 +11441,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lobbyName: {fileID: 1432759910}
   lobbyCode: {fileID: 800222464}
-<<<<<<< HEAD
-<<<<<<< HEAD
-  playerInfoContainer: {fileID: 1187664230}
-  redTeamContainer: {fileID: 1444104300}
-  blueTeamContainer: {fileID: 877352481}
-  playerInfoPrefab: {fileID: 7955813089005486528, guid: a2412fb5eabdce14f9ee0050d29536bd, type: 3}
-=======
-=======
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
   playerInfoContainer: {fileID: 1181908189}
   redTeamContainer: {fileID: 581770409}
   blueTeamContainer: {fileID: 81033647}
   playerInfoPrefab: {fileID: 5071619995171099914, guid: 076ef0f242d9415499c9fdebda2bfbe2, type: 3}
   startReadyButton: {fileID: 434964657}
   startReadyButtonText: {fileID: 684050785}
-<<<<<<< HEAD
-  playerPrefab: {fileID: 6868858680571278620}
-=======
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
 --- !u!114 &1752736371
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13646,15 +13633,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bab02ea58d56ee64d834f0b531e6a03a, type: 3}
-<<<<<<< HEAD
---- !u!1 &6868858680571278620 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8583259210489463119, guid: bab02ea58d56ee64d834f0b531e6a03a, type: 3}
-  m_PrefabInstance: {fileID: 6868858680571278619}
-  m_PrefabAsset: {fileID: 0}
->>>>>>> parent of 548f87e (Kullanıcı Adı Arayüzü tasarımı gerçekleştirildi)
-=======
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

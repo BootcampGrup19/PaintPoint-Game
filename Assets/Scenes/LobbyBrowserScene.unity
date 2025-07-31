@@ -5140,7 +5140,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: a7b350cc3e7a23e4893d9a733d7751b9, type: 3}
+  m_Texture: {fileID: 2800000, guid: 061fe5b94a8c6904286eaffd23996f47, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -8746,11 +8746,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
 --- !u!1001 &304198363138461741
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8835,8 +8830,6 @@ PrefabInstance:
       propertyPath: rowContainer
       value: 
       objectReference: {fileID: 1148678544}
-<<<<<<< HEAD
-=======
     - target: {fileID: 9152716819647155439, guid: 9fd4050601bb325499ec1ed47bbc40b0, type: 3}
       propertyPath: playerNameInput
       value: 
@@ -8853,16 +8846,11 @@ PrefabInstance:
       propertyPath: lobbyBrowserPanel
       value: 
       objectReference: {fileID: 671585471}
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9fd4050601bb325499ec1ed47bbc40b0, type: 3}
-<<<<<<< HEAD
->>>>>>> parent of 548f87e (Kullanıcı Adı Arayüzü tasarımı gerçekleştirildi)
-=======
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -19,11 +19,6 @@ public class CreateALobby : MonoBehaviour
     public Button createLobbyButton;
     private Coroutine heartbeatCoroutine;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
     void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -37,17 +32,10 @@ public class CreateALobby : MonoBehaviour
         if (s.name == "LobbyBrowserScene")
         {
             StartCoroutine(WaitForInputField());
-<<<<<<< HEAD
-
-            password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
-=======
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
         }
     }
     IEnumerator WaitForInputField()
     {
-<<<<<<< HEAD
-=======
         GameObject controller = null;
 
         while (controller == null)
@@ -58,7 +46,6 @@ public class CreateALobby : MonoBehaviour
 
         password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
 
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
         GameObject inputObj = null;
 
         while (inputObj == null)
@@ -75,10 +62,6 @@ public class CreateALobby : MonoBehaviour
         createLobbyButton.onClick.RemoveAllListeners();
         createLobbyButton.onClick.AddListener(CreateLobbyMethod);
     }
-<<<<<<< HEAD
->>>>>>> parent of 548f87e (Kullanıcı Adı Arayüzü tasarımı gerçekleştirildi)
-=======
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
     public async void CreateLobbyMethod()
     {
         string lobbyName = LobbyName.text;

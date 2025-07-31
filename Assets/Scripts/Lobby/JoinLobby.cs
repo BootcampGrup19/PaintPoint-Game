@@ -19,11 +19,6 @@ public class JoinLobby : MonoBehaviour
     private CurrentLobby _currentLobby;
     private string playerName;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
     void OnEnable(){
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -34,19 +29,6 @@ public class JoinLobby : MonoBehaviour
     {
         if (s.name == "LobbyBrowserScene")
         {
-<<<<<<< HEAD
-            lobbyCode = GameObject.Find("LobbyJoinCodeInputField").GetComponent<TMP_InputField>();
-            password = GameObject.Find("LobbyPasswordInputField").GetComponent<TMP_InputField>();
-            quickJoinButton = GameObject.Find("QuickJoinButton").GetComponent<Button>();
-            joinButton = GameObject.Find("JoinButton").GetComponent<Button>();
-
-            quickJoinButton.onClick.RemoveAllListeners();
-            joinButton.onClick.RemoveAllListeners();
-            quickJoinButton.onClick.AddListener(QuickJoinMethod);
-            joinButton.onClick.AddListener(JoinLobbyWithLobbyCode);
-        }
-    }
-=======
             StartCoroutine(WaitForInputField());
         }
     }
@@ -70,16 +52,11 @@ public class JoinLobby : MonoBehaviour
         quickJoinButton.onClick.AddListener(QuickJoinMethod);
         joinButton.onClick.AddListener(JoinLobbyWithLobbyCode);
     }
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
     private void Start()
     {
         _currentLobby = CurrentLobby.Instance;
         playerName = AuthenticationService.Instance.PlayerName;
     }
-<<<<<<< HEAD
->>>>>>> parent of 548f87e (Kullanıcı Adı Arayüzü tasarımı gerçekleştirildi)
-=======
->>>>>>> parent of 5fe7e8f (Revert "Merge branch 'multiplayer-system'")
     public async void JoinLobbyWithLobbyCode()
     {
         var code = lobbyCode.text;
