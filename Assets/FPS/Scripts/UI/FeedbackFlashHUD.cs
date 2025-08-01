@@ -69,7 +69,7 @@ namespace Unity.FPS.UI
             {
                 VignetteCanvasGroup.gameObject.SetActive(true);
                 float vignetteAlpha =
-                    (1 - (m_PlayerHealth.CurrentHealth / m_PlayerHealth.MaxHealth /
+                    (1 - (m_PlayerHealth.CurrentHealth.Value / m_PlayerHealth.MaxHealth /
                           m_PlayerHealth.CriticalHealthRatio)) * CriticaHealthVignetteMaxAlpha;
 
                 if (m_GameFlowManager.GameIsEnding)
