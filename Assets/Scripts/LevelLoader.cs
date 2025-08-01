@@ -7,7 +7,7 @@ namespace Unity.BizimKodlar
     public class LevelLoader : MonoBehaviour
     {
         [SerializeField]
-        private Animator animator;
+        private Animator animator1,animator2;
 
         public float transitionTime = .5f;
 
@@ -23,7 +23,8 @@ namespace Unity.BizimKodlar
 
         public IEnumerator LoadLevel(int levelIndex)
         {
-            animator.SetTrigger("start");
+            animator1.SetTrigger("start");
+            animator2.SetTrigger("start");
             yield return new WaitForSeconds(transitionTime);
             SceneManager.LoadScene(levelIndex);
         }
