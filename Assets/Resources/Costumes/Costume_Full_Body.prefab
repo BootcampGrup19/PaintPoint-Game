@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8433746418832978370}
   m_Layer: 0
   m_Name: Costume_Full_Body
-  m_TagString: Untagged
+  m_TagString: clothes
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -85,6 +85,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Costume_13_001
       objectReference: {fileID: 0}
+    - target: {fileID: 766723520473918103, guid: 14f61ecc52af1b342818547159d19ac2, type: 3}
+      propertyPath: m_TagString
+      value: clothes
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -146,6 +150,10 @@ PrefabInstance:
     - target: {fileID: 4234659692364203389, guid: 48013649fde2719469b91a7b7816e693, type: 3}
       propertyPath: m_Name
       value: Costume_13_002
+      objectReference: {fileID: 0}
+    - target: {fileID: 4234659692364203389, guid: 48013649fde2719469b91a7b7816e693, type: 3}
+      propertyPath: m_TagString
+      value: clothes
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

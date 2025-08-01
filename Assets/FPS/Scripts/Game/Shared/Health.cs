@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
+using Unity.Netcode;
 
 namespace Unity.FPS.Game
 {
-    public class Health : MonoBehaviour
+    public class Health : NetworkBehaviour
     {
         [Tooltip("Maximum amount of health")] public float MaxHealth = 10f;
 
@@ -14,45 +15,54 @@ namespace Unity.FPS.Game
         public UnityAction<float> OnHealed;
         public UnityAction OnDie;
 
-        public float CurrentHealth { get; set; }
+        public NetworkVariable<float> CurrentHealth { get; set; } = new NetworkVariable<float>();
         public bool Invincible { get; set; }
-        public bool CanPickup() => CurrentHealth < MaxHealth;
+        public bool CanPickup() => CurrentHealth.Value < MaxHealth;
 
-        public float GetRatio() => CurrentHealth / MaxHealth;
+        public float GetRatio() => CurrentHealth.Value / MaxHealth;
         public bool IsCritical() => GetRatio() <= CriticalHealthRatio;
 
         bool m_IsDead;
 
-        void Start()
+        public override void OnNetworkSpawn()
         {
-            CurrentHealth = MaxHealth;
+            if (IsServer)
+                CurrentHealth.Value = MaxHealth;
         }
 
         public void Heal(float healAmount)
         {
-            float healthBefore = CurrentHealth;
-            CurrentHealth += healAmount;
-            CurrentHealth = Mathf.Clamp(CurrentHealth, 0f, MaxHealth);
+            float healthBefore = CurrentHealth.Value;
+            CurrentHealth.Value += healAmount;
+            CurrentHealth.Value = Mathf.Clamp(CurrentHealth.Value, 0f, MaxHealth);
 
             // call OnHeal action
-            float trueHealAmount = CurrentHealth - healthBefore;
+            float trueHealAmount = CurrentHealth.Value - healthBefore;
             if (trueHealAmount > 0f)
             {
                 OnHealed?.Invoke(trueHealAmount);
             }
         }
 
-        public void TakeDamage(float damage, GameObject damageSource)
+        [ServerRpc]
+        public void TakeDamageServerRpc(float damage, bool hasSource, NetworkObjectReference damageSourceRef)
         {
             if (Invincible)
                 return;
 
-            float healthBefore = CurrentHealth;
-            CurrentHealth -= damage;
-            CurrentHealth = Mathf.Clamp(CurrentHealth, 0f, MaxHealth);
+            float healthBefore = CurrentHealth.Value;
+            CurrentHealth.Value -= damage;
+            CurrentHealth.Value = Mathf.Clamp(CurrentHealth.Value, 0f, MaxHealth);
 
             // call OnDamage action
-            float trueDamageAmount = healthBefore - CurrentHealth;
+            float trueDamageAmount = healthBefore - CurrentHealth.Value;
+
+            GameObject damageSource = null;
+            if (hasSource && damageSourceRef.TryGet(out NetworkObject sourceNetObj))
+            {
+                damageSource = sourceNetObj.gameObject;
+            }
+
             if (trueDamageAmount > 0f)
             {
                 OnDamaged?.Invoke(trueDamageAmount, damageSource);
@@ -63,7 +73,7 @@ namespace Unity.FPS.Game
 
         public void Kill()
         {
-            CurrentHealth = 0f;
+            CurrentHealth.Value = 0f;
 
             // call OnDamage action
             OnDamaged?.Invoke(MaxHealth, null);
@@ -77,7 +87,7 @@ namespace Unity.FPS.Game
                 return;
 
             // call OnDie action
-            if (CurrentHealth <= 0f)
+            if (CurrentHealth.Value <= 0f)
             {
                 m_IsDead = true;
                 OnDie?.Invoke();

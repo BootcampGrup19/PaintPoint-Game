@@ -3198,6 +3198,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 3986356881735714312, guid: 28556fb19356c954384de751c785377b, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 457111147
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -361,7 +361,7 @@ namespace Unity.BizimKodlar
             TextChatManager.Instance.QuitChatChannelAsync();
 
             NetworkManager.Singleton.SceneManager.LoadScene(
-            "MultiplayerScene",
+            "Mekan1",
             UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
         public async void SubscribeToLobbyChanges()
