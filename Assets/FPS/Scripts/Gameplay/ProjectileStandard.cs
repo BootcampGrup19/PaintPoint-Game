@@ -87,7 +87,9 @@ namespace Unity.FPS.Gameplay
             m_ProjectileBase.OnShoot += OnShoot;
 
             Destroy(gameObject, MaxLifeTime);
+
         }
+
 
         new void OnShoot()
         {
@@ -135,6 +137,8 @@ namespace Unity.FPS.Gameplay
 
         void Update()
         {
+            PaintColor = PlayerPaintColor.CurrentPaintColor;
+
             // Move
             transform.position += m_Velocity * Time.deltaTime;
             if (InheritWeaponVelocity)
