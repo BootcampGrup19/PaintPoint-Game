@@ -153,7 +153,7 @@ namespace Unity.FPS.Gameplay
 
             foreach (Color pixel in pixels)
             {
-                if (pixel.maxColorComponent < 0.1f) continue; // Siyah veya boyanmam��sa atla
+                //if (pixel.maxColorComponent < 0.1f) continue; // Siyah veya boyanmam��sa atla
 
                 totalPainted++;
 

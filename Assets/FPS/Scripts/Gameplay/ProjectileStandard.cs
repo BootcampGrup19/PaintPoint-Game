@@ -10,7 +10,7 @@ namespace Unity.FPS.Gameplay
         public float PaintRadius = 1f;
         public float PaintHardness = 1f;
         public float PaintStrength = 1f;
-        public Color PaintColor = Color.red;
+        private Color PaintColor = Color.red;
 
         [Header("General")]
         [Tooltip("Radius of this projectile's collision detection")]
