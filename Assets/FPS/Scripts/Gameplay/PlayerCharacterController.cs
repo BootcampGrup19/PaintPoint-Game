@@ -109,7 +109,7 @@ namespace Unity.FPS.Gameplay
         {
             get
             {
-                if (m_WeaponsManager.IsAiming)
+                if (m_WeaponsManager.IsAiming.Value)
                 {
                     return AimingRotationMultiplier;
                 }
