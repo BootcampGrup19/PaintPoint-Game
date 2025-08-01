@@ -56,6 +56,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Male_emotion_happy_002
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e4f543c638ecbfd40b8dc37cd298e48a, type: 3}
+      propertyPath: m_TagString
+      value: clothes
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

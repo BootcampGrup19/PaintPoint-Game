@@ -56,6 +56,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Clown_nose_001
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 9ca093b63b32bc6479e8706c849e1ee2, type: 3}
+      propertyPath: m_TagString
+      value: clothes
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
