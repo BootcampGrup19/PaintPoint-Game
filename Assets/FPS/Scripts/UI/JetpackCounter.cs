@@ -18,7 +18,7 @@ namespace Unity.FPS.UI
 
         Jetpack m_Jetpack;
 
-        void Start()
+        void Awake()
         {
             m_Jetpack = FindFirstObjectByType<Jetpack>();
             DebugUtility.HandleErrorIfNullFindObject<Jetpack, JetpackCounter>(m_Jetpack, this);

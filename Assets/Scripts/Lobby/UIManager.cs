@@ -8,7 +8,7 @@ using Unity.Netcode;
 
 namespace Unity.BizimKodlar
 {
-    public class UIManager : NetworkBehaviour
+    public class UIManager : MonoBehaviour
     {
         [Header("UI Panels")]
         public GameObject lobbyRoomPanel;
@@ -119,13 +119,10 @@ namespace Unity.BizimKodlar
                 player.GetComponent<NetworkCharacterCustomizer>().SaveCustomization(data);
             }
 
-            if (IsOwner)
-            {
-                // Eğer PlayerPrefs ile kaydetmek istiyorsan:
-                string json = JsonUtility.ToJson(data);
-                PlayerPrefs.SetString("CharacterData", json);
-                PlayerPrefs.Save(); 
-            }
+            // Eğer PlayerPrefs ile kaydetmek istiyorsan:
+            string json = JsonUtility.ToJson(data);
+            PlayerPrefs.SetString("CharacterData", json);
+            PlayerPrefs.Save();
         }
         void PopulateOptions(List<GameObject> prefabs, string category)
         {

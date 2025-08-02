@@ -56,7 +56,7 @@ namespace Unity.FPS.Game
                 }
 
                 // potentially reduce damages if inflicted by self
-                if (damageSourceRef.TryGet(out NetworkObject sourceNetObj) && IsOwner)
+                if (damageSourceRef.TryGet(out NetworkObject sourceNetObj))
                 {
                     if (Health.gameObject == sourceNetObj.gameObject)
                         totalDamage *= SensibilityToSelfdamage;
@@ -65,8 +65,7 @@ namespace Unity.FPS.Game
                 }
                 else
                 {
-                    if (IsOwner)
-                        Health.TakeDamageServerRpc(totalDamage, false, default); // Kaynağı belirlenemeyen hasar
+                    Health.TakeDamageServerRpc(totalDamage, false, default); // Kaynağı belirlenemeyen hasar
                 }
             }
         }

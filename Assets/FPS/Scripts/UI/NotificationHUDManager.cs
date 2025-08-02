@@ -12,7 +12,7 @@ namespace Unity.FPS.UI
         [Tooltip("Prefab for the notifications")]
         public GameObject NotificationPrefab;
 
-        void Start()
+        void Awake()
         {
             PlayerWeaponsManager playerWeaponsManager = FindFirstObjectByType<PlayerWeaponsManager>();
             DebugUtility.HandleErrorIfNullFindObject<PlayerWeaponsManager, NotificationHUDManager>(playerWeaponsManager,

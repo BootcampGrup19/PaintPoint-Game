@@ -4,7 +4,7 @@ public class RemoveAllColliders : MonoBehaviour
 {
     void Start()
     {
-        Collider[] allColliders = Object.FindObjectsByType<Collider>(FindObjectsSortMode.None);
+        Collider[] allColliders = FindObjectsOfType<Collider>();
 
         foreach (Collider col in allColliders)
         {
