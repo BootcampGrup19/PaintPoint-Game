@@ -20,8 +20,7 @@ namespace Unity.FPS.Gameplay
         [Tooltip("List of weapon the player will start with")]
         public List<WeaponController> StartingWeapons = new List<WeaponController>();
 
-        [Header("References")]
-        [Tooltip("Secondary camera used to avoid seeing weapon go throw geometries")]
+        [Header("References")] [Tooltip("Secondary camera used to avoid seeing weapon go throw geometries")]
         public Camera WeaponCamera;
 
         [Tooltip("Parent transform where all weapon will be added in the hierarchy")]
@@ -59,8 +58,7 @@ namespace Unity.FPS.Gameplay
         [Tooltip("How fast the weapon goes back to it's original position after the recoil is finished")]
         public float RecoilRestitutionSharpness = 10f;
 
-        [Header("Misc")]
-        [Tooltip("Speed at which the aiming animatoin is played")]
+        [Header("Misc")] [Tooltip("Speed at which the aiming animatoin is played")]
         public float AimingAnimationSpeed = 10f;
 
         [Tooltip("Field of view when not aiming")]
@@ -75,8 +73,8 @@ namespace Unity.FPS.Gameplay
         [Tooltip("Layer to set FPS weapon gameObjects to")]
         public LayerMask FpsWeaponLayer;
 
-        public NetworkVariable<bool> IsAiming { get; private set; } = new NetworkVariable<bool>();
-        public NetworkVariable<bool> IsPointingAtEnemy { get; private set; } = new NetworkVariable<bool>();
+        public bool IsAiming { get; private set; }
+        public bool IsPointingAtEnemy { get; private set; }
         public NetworkVariable<int> ActiveWeaponIndex { get; private set; } = new NetworkVariable<int>(0);
 
         public UnityAction<WeaponController> OnSwitchedToWeapon;
@@ -125,7 +123,7 @@ namespace Unity.FPS.Gameplay
         void Update()
         {
             if (!IsOwner) return;
-
+            
             // shoot handling
             WeaponController activeWeapon = GetActiveWeapon();
 
@@ -136,12 +134,12 @@ namespace Unity.FPS.Gameplay
             {
                 if (!activeWeapon.AutomaticReload && m_InputHandler.GetReloadButtonDown() && activeWeapon.CurrentAmmoRatio < 1.0f)
                 {
-                    IsAiming.Value = false;
+                    IsAiming = false;
                     activeWeapon.StartReloadAnimation();
                     return;
                 }
                 // handle aiming down sights
-                IsAiming.Value = m_InputHandler.GetAimInputHeld();
+                IsAiming = m_InputHandler.GetAimInputHeld();
 
                 // handle shooting
                 bool hasFired = activeWeapon.HandleShootInputs(
@@ -158,7 +156,7 @@ namespace Unity.FPS.Gameplay
             }
 
             // weapon switch handling
-            if (!IsAiming.Value &&
+            if (!IsAiming &&
                 (activeWeapon == null || !activeWeapon.IsCharging) &&
                 (m_WeaponSwitchState == WeaponSwitchState.Up || m_WeaponSwitchState == WeaponSwitchState.Down))
             {
@@ -180,7 +178,7 @@ namespace Unity.FPS.Gameplay
             }
 
             // Pointing at enemy handling
-            IsPointingAtEnemy.Value = false;
+            IsPointingAtEnemy = false;
             if (activeWeapon)
             {
                 if (Physics.Raycast(WeaponCamera.transform.position, WeaponCamera.transform.forward, out RaycastHit hit,
@@ -188,7 +186,7 @@ namespace Unity.FPS.Gameplay
                 {
                     if (hit.collider.GetComponentInParent<Health>() != null)
                     {
-                        IsPointingAtEnemy.Value = true;
+                        IsPointingAtEnemy = true;
                     }
                 }
             }
@@ -291,7 +289,7 @@ namespace Unity.FPS.Gameplay
             if (m_WeaponSwitchState == WeaponSwitchState.Up)
             {
                 WeaponController activeWeapon = GetActiveWeapon();
-                if (IsAiming.Value && activeWeapon)
+                if (IsAiming && activeWeapon)
                 {
                     m_WeaponMainLocalPosition = Vector3.Lerp(m_WeaponMainLocalPosition,
                         AimingWeaponPosition.localPosition + activeWeapon.AimOffset,
@@ -331,7 +329,7 @@ namespace Unity.FPS.Gameplay
                     Mathf.Lerp(m_WeaponBobFactor, characterMovementFactor, BobSharpness * Time.deltaTime);
 
                 // Calculate vertical and horizontal weapon bob values based on a sine function
-                float bobAmount = IsAiming.Value ? AimingBobAmount : DefaultBobAmount;
+                float bobAmount = IsAiming ? AimingBobAmount : DefaultBobAmount;
                 float frequency = BobFrequency;
                 float hBobValue = Mathf.Sin(Time.time * frequency) * bobAmount * m_WeaponBobFactor;
                 float vBobValue = ((Mathf.Sin(Time.time * frequency * 2f) * 0.5f) + 0.5f) * bobAmount *
@@ -561,17 +559,5 @@ namespace Unity.FPS.Gameplay
                 newWeapon.ShowWeapon(true);
             }
         }
-        [ServerRpc]
-        void SwitchWeaponServerRpc(int newIndex)
-        {
-            SwitchToWeaponIndex(newIndex, true);
-        }
-
-        [ClientRpc]
-        void PlayWeaponSwitchClientRpc(int newIndex)
-        {
-            SwitchToWeaponIndex(newIndex, true);
-        }
-
     }
 }
