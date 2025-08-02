@@ -360,6 +360,8 @@ namespace Unity.BizimKodlar
 
             TextChatManager.Instance.QuitChatChannelAsync();
 
+            GameSceneSpawner.Instance.StartPlayerPrefabSpawnControllerEvent();
+
             NetworkManager.Singleton.SceneManager.LoadScene(
             "Mekan1",
             UnityEngine.SceneManagement.LoadSceneMode.Single);
