@@ -224,7 +224,7 @@ namespace Unity.FPS.Gameplay
             IsDead = true;
 
             // Tell the weapons manager to switch to a non-existing weapon in order to lower the weapon
-            m_WeaponsManager.SwitchWeaponServerRpc(-1);
+            m_WeaponsManager.SwitchToWeaponIndex(-1, true);
 
             EventManager.Broadcast(Events.PlayerDeathEvent);
         }

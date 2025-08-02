@@ -31,7 +31,7 @@ namespace Unity.FPS.UI
         void Update()
         {
             UpdateCrosshairPointingAtEnemy(false);
-            m_WasPointingAtEnemy = m_WeaponsManager.IsPointingAtEnemy;
+            m_WasPointingAtEnemy = m_WeaponsManager.IsPointingAtEnemy.Value;
         }
 
         void UpdateCrosshairPointingAtEnemy(bool force)
@@ -39,13 +39,13 @@ namespace Unity.FPS.UI
             if (m_CrosshairDataDefault.CrosshairSprite == null)
                 return;
 
-            if ((force || !m_WasPointingAtEnemy) && m_WeaponsManager.IsPointingAtEnemy)
+            if ((force || !m_WasPointingAtEnemy) && m_WeaponsManager.IsPointingAtEnemy.Value)
             {
                 m_CurrentCrosshair = m_CrosshairDataTarget;
                 CrosshairImage.sprite = m_CurrentCrosshair.CrosshairSprite;
                 m_CrosshairRectTransform.sizeDelta = m_CurrentCrosshair.CrosshairSize * Vector2.one;
             }
-            else if ((force || m_WasPointingAtEnemy) && !m_WeaponsManager.IsPointingAtEnemy)
+            else if ((force || m_WasPointingAtEnemy) && !m_WeaponsManager.IsPointingAtEnemy.Value)
             {
                 m_CurrentCrosshair = m_CrosshairDataDefault;
                 CrosshairImage.sprite = m_CurrentCrosshair.CrosshairSprite;
