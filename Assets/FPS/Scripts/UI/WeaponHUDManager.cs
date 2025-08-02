@@ -25,7 +25,7 @@ namespace Unity.FPS.UI
             WeaponController activeWeapon = m_PlayerWeaponsManager.GetActiveWeapon();
             if (activeWeapon)
             {
-                AddWeapon(activeWeapon, m_PlayerWeaponsManager.ActiveWeaponIndex.Value);
+                AddWeapon(activeWeapon, m_PlayerWeaponsManager.ActiveWeaponIndex);
                 ChangeWeapon(activeWeapon);
             }
 
