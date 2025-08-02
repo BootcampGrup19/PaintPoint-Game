@@ -136,10 +136,7 @@ namespace Unity.BizimKodlar
         {
             foreach (Transform child in characterRoot)
             {
-                if(child.gameObject.tag == "clothes")
-                {
-                    Destroy(child.gameObject);
-                }
+                Destroy(child.gameObject);
             }
         }
     }

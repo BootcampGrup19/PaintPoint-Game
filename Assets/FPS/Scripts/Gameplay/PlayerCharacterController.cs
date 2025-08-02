@@ -1,12 +1,11 @@
 ﻿using Unity.FPS.Game;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Unity.FPS.Gameplay
 {
     [RequireComponent(typeof(CharacterController), typeof(PlayerInputHandler), typeof(AudioSource))]
-    public class PlayerCharacterController : NetworkBehaviour
+    public class PlayerCharacterController : MonoBehaviour
     {
         [Header("References")] [Tooltip("Reference to the main camera used for the player")]
         public Camera PlayerCamera;
@@ -173,8 +172,6 @@ namespace Unity.FPS.Gameplay
 
         void Update()
         {
-            if (!IsOwner) return;
-
             // check for Y kill
             if (!IsDead && transform.position.y < KillHeight)
             {
@@ -196,7 +193,7 @@ namespace Unity.FPS.Gameplay
                 if (RecievesFallDamage && fallSpeedRatio > 0f)
                 {
                     float dmgFromFall = Mathf.Lerp(FallDamageAtMinSpeed, FallDamageAtMaxSpeed, fallSpeedRatio);
-                    m_Health.TakeDamageServerRpc(dmgFromFall,false, default);
+                    m_Health.TakeDamage(dmgFromFall, null);
 
                     // fall damage SFX
                     AudioSource.PlayOneShot(FallDamageSfx);

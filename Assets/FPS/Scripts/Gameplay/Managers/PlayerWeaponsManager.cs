@@ -2,12 +2,11 @@
 using Unity.FPS.Game;
 using UnityEngine;
 using UnityEngine.Events;
-using Unity.Netcode;
 
 namespace Unity.FPS.Gameplay
 {
     [RequireComponent(typeof(PlayerInputHandler))]
-    public class PlayerWeaponsManager : NetworkBehaviour
+    public class PlayerWeaponsManager : MonoBehaviour
     {
         public enum WeaponSwitchState
         {
@@ -75,7 +74,7 @@ namespace Unity.FPS.Gameplay
 
         public bool IsAiming { get; private set; }
         public bool IsPointingAtEnemy { get; private set; }
-        public NetworkVariable<int> ActiveWeaponIndex { get; private set; } = new NetworkVariable<int>(0);
+        public int ActiveWeaponIndex { get; private set; }
 
         public UnityAction<WeaponController> OnSwitchedToWeapon;
         public UnityAction<WeaponController, int> OnAddedWeapon;
@@ -96,7 +95,7 @@ namespace Unity.FPS.Gameplay
 
         void Start()
         {
-            ActiveWeaponIndex.Value = -1;
+            ActiveWeaponIndex = -1;
             m_WeaponSwitchState = WeaponSwitchState.Down;
 
             m_InputHandler = GetComponent<PlayerInputHandler>();
@@ -122,8 +121,6 @@ namespace Unity.FPS.Gameplay
 
         void Update()
         {
-            if (!IsOwner) return;
-            
             // shoot handling
             WeaponController activeWeapon = GetActiveWeapon();
 
@@ -222,9 +219,9 @@ namespace Unity.FPS.Gameplay
             {
                 // If the weapon at this slot is valid, calculate its "distance" from the active slot index (either in ascending or descending order)
                 // and select it if it's the closest distance yet
-                if (i != ActiveWeaponIndex.Value && GetWeaponAtSlotIndex(i) != null)
+                if (i != ActiveWeaponIndex && GetWeaponAtSlotIndex(i) != null)
                 {
-                    int distanceToActiveIndex = GetDistanceBetweenWeaponSlots(ActiveWeaponIndex.Value, i, ascendingOrder);
+                    int distanceToActiveIndex = GetDistanceBetweenWeaponSlots(ActiveWeaponIndex, i, ascendingOrder);
 
                     if (distanceToActiveIndex < closestSlotDistance)
                     {
@@ -241,7 +238,7 @@ namespace Unity.FPS.Gameplay
         // Switches to the given weapon index in weapon slots if the new index is a valid weapon that is different from our current one
         public void SwitchToWeaponIndex(int newWeaponIndex, bool force = false)
         {
-            if (force || (newWeaponIndex != ActiveWeaponIndex.Value && newWeaponIndex >= 0))
+            if (force || (newWeaponIndex != ActiveWeaponIndex && newWeaponIndex >= 0))
             {
                 // Store data related to weapon switching animation
                 m_WeaponSwitchNewWeaponIndex = newWeaponIndex;
@@ -252,7 +249,7 @@ namespace Unity.FPS.Gameplay
                 {
                     m_WeaponMainLocalPosition = DownWeaponPosition.localPosition;
                     m_WeaponSwitchState = WeaponSwitchState.PutUpNew;
-                    ActiveWeaponIndex.Value = m_WeaponSwitchNewWeaponIndex;
+                    ActiveWeaponIndex = m_WeaponSwitchNewWeaponIndex;
 
                     WeaponController newWeapon = GetWeaponAtSlotIndex(m_WeaponSwitchNewWeaponIndex);
                     if (OnSwitchedToWeapon != null)
@@ -381,17 +378,17 @@ namespace Unity.FPS.Gameplay
                 if (m_WeaponSwitchState == WeaponSwitchState.PutDownPrevious)
                 {
                     // Deactivate old weapon
-                    WeaponController oldWeapon = GetWeaponAtSlotIndex(ActiveWeaponIndex.Value);
+                    WeaponController oldWeapon = GetWeaponAtSlotIndex(ActiveWeaponIndex);
                     if (oldWeapon != null)
                     {
                         oldWeapon.ShowWeapon(false);
                     }
 
-                    ActiveWeaponIndex.Value = m_WeaponSwitchNewWeaponIndex;
+                    ActiveWeaponIndex = m_WeaponSwitchNewWeaponIndex;
                     switchingTimeFactor = 0f;
 
                     // Activate new weapon
-                    WeaponController newWeapon = GetWeaponAtSlotIndex(ActiveWeaponIndex.Value);
+                    WeaponController newWeapon = GetWeaponAtSlotIndex(ActiveWeaponIndex);
                     if (OnSwitchedToWeapon != null)
                     {
                         OnSwitchedToWeapon.Invoke(newWeapon);
@@ -499,7 +496,7 @@ namespace Unity.FPS.Gameplay
                     Destroy(weaponInstance.gameObject);
 
                     // Handle case of removing active weapon (switch to next weapon)
-                    if (i == ActiveWeaponIndex.Value)
+                    if (i == ActiveWeaponIndex)
                     {
                         SwitchWeapon(true);
                     }
@@ -513,7 +510,7 @@ namespace Unity.FPS.Gameplay
 
         public WeaponController GetActiveWeapon()
         {
-            return GetWeaponAtSlotIndex(ActiveWeaponIndex.Value);
+            return GetWeaponAtSlotIndex(ActiveWeaponIndex);
         }
 
         public WeaponController GetWeaponAtSlotIndex(int index)
