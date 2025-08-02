@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 using DG.Tweening;
+using Unity.FPS.Gameplay;
 
 namespace Unity.BizimKodlar
 {
@@ -15,9 +16,18 @@ namespace Unity.BizimKodlar
         [SerializeField]
         private GameObject countImgs;
 
+        private PlayerInputHandler playerInputHandler;
+
 
         private void Start()
         {
+            playerInputHandler = FindFirstObjectByType<PlayerInputHandler>();
+
+
+            if (playerInputHandler != null)
+                playerInputHandler.InputDisabled = true;
+
+
             countTxt.text = "3";
             countImgs.GetComponent<RectTransform>().localScale = Vector3.zero;
             countImgs.GetComponent<CanvasGroup>().alpha = 0;
@@ -62,6 +72,9 @@ namespace Unity.BizimKodlar
             countImgs.GetComponent<CanvasGroup>().DOFade(0f, .5f).SetEase(Ease.OutBack);
 
             timerRunning = true;
+
+            if (playerInputHandler != null)
+                playerInputHandler.InputDisabled = false;
         }
 
         void Update()

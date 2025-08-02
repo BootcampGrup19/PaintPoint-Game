@@ -9,14 +9,14 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 0f9759665f7844545afbe04340ba9927
   - enabled: 1
-    path: Assets/Scenes/LobbyBrowserScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/Mekan1.unity
+    guid: 130de191e9bf7de41a659f68e5741ed0
   - enabled: 1
-    path: Assets/Scenes/LobbyRoom.unity
-    guid: b4f6866c796d62143b6e502e0c6d89cb
+    path: Assets/Scenes/Mekan2.unity
+    guid: 382030faa9d96f6449f17538353f6490
   - enabled: 1
-    path: Assets/Scenes/MultiplayerScene.unity
-    guid: 77ea8c084bfc84e4491b70e1853222c8
+    path: Assets/Scenes/Mekan3.unity
+    guid: 46521d246460e9f4c82c944eef848595
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

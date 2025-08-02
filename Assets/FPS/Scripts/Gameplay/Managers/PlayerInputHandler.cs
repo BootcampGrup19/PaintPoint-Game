@@ -72,9 +72,11 @@ namespace Unity.FPS.Gameplay
             m_FireInputWasHeld = GetFireInputHeld();
         }
 
+        public bool InputDisabled { get; set; } = false;
+
         public bool CanProcessInput()
         {
-            return Cursor.lockState == CursorLockMode.Locked && !m_GameFlowManager.GameIsEnding;
+            return Cursor.lockState == CursorLockMode.Locked && !m_GameFlowManager.GameIsEnding && !InputDisabled;
         }
 
         public Vector3 GetMoveInput()

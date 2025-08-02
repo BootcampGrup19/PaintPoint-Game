@@ -29,6 +29,5 @@ namespace Unity.BizimKodlar
             SceneManager.LoadScene(levelIndex);
         }
 
-
     }
 }
