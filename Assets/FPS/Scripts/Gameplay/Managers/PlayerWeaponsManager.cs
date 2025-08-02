@@ -76,8 +76,8 @@ namespace Unity.FPS.Gameplay
         public LayerMask FpsWeaponLayer;
 
         public NetworkVariable<bool> IsAiming { get; private set; } = new NetworkVariable<bool>();
-        public NetworkVariable<bool> IsPointingAtEnemy { get; private set; } = new NetworkVariable<bool>();
-        public NetworkVariable<int> ActiveWeaponIndex { get; private set; } = new NetworkVariable<int>(0);
+        public bool IsPointingAtEnemy { get; private set; }
+        public NetworkVariable<int> ActiveWeaponIndex { get; private set; } = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         public UnityAction<WeaponController> OnSwitchedToWeapon;
         public UnityAction<WeaponController, int> OnAddedWeapon;
@@ -137,7 +137,7 @@ namespace Unity.FPS.Gameplay
                 if (!activeWeapon.AutomaticReload && m_InputHandler.GetReloadButtonDown() && activeWeapon.CurrentAmmoRatio < 1.0f)
                 {
                     IsAiming.Value = false;
-                    activeWeapon.StartReloadAnimation();
+                    ReloadServerRpc();
                     return;
                 }
                 // handle aiming down sights
@@ -152,8 +152,9 @@ namespace Unity.FPS.Gameplay
                 // Handle accumulating recoil
                 if (hasFired)
                 {
-                    m_AccumulatedRecoil += Vector3.back * activeWeapon.RecoilForce;
-                    m_AccumulatedRecoil = Vector3.ClampMagnitude(m_AccumulatedRecoil, MaxRecoilDistance);
+                    FireServerRpc();
+                    /*m_AccumulatedRecoil += Vector3.back * activeWeapon.RecoilForce;
+                    m_AccumulatedRecoil = Vector3.ClampMagnitude(m_AccumulatedRecoil, MaxRecoilDistance);*/
                 }
             }
 
@@ -166,7 +167,8 @@ namespace Unity.FPS.Gameplay
                 if (switchWeaponInput != 0)
                 {
                     bool switchUp = switchWeaponInput > 0;
-                    SwitchWeapon(switchUp);
+                    int newIndex = CalculateNextWeaponIndex(switchUp);
+                    SwitchWeaponServerRpc(newIndex);
                 }
                 else
                 {
@@ -174,13 +176,13 @@ namespace Unity.FPS.Gameplay
                     if (switchWeaponInput != 0)
                     {
                         if (GetWeaponAtSlotIndex(switchWeaponInput - 1) != null)
-                            SwitchToWeaponIndex(switchWeaponInput - 1);
+                            SwitchWeaponServerRpc(switchWeaponInput - 1);
                     }
                 }
             }
 
             // Pointing at enemy handling
-            IsPointingAtEnemy.Value = false;
+            IsPointingAtEnemy = false;
             if (activeWeapon)
             {
                 if (Physics.Raycast(WeaponCamera.transform.position, WeaponCamera.transform.forward, out RaycastHit hit,
@@ -188,7 +190,7 @@ namespace Unity.FPS.Gameplay
                 {
                     if (hit.collider.GetComponentInParent<Health>() != null)
                     {
-                        IsPointingAtEnemy.Value = true;
+                        IsPointingAtEnemy = true;
                     }
                 }
             }
@@ -214,6 +216,27 @@ namespace Unity.FPS.Gameplay
             m_PlayerCharacterController.PlayerCamera.fieldOfView = fov;
             WeaponCamera.fieldOfView = fov * WeaponFovMultiplier;
         }
+        int CalculateNextWeaponIndex(bool ascendingOrder)
+        {
+            int newWeaponIndex = -1;
+            int closestSlotDistance = m_WeaponSlots.Length;
+
+            for (int i = 0; i < m_WeaponSlots.Length; i++)
+            {
+                if (i != ActiveWeaponIndex.Value && GetWeaponAtSlotIndex(i) != null)
+                {
+                    int distanceToActiveIndex = GetDistanceBetweenWeaponSlots(ActiveWeaponIndex.Value, i, ascendingOrder);
+
+                    if (distanceToActiveIndex < closestSlotDistance)
+                    {
+                        closestSlotDistance = distanceToActiveIndex;
+                        newWeaponIndex = i;
+                    }
+                }
+            }
+
+            return newWeaponIndex;
+        }
 
         // Iterate on all weapon slots to find the next valid weapon to switch to
         public void SwitchWeapon(bool ascendingOrder)
@@ -237,7 +260,7 @@ namespace Unity.FPS.Gameplay
             }
 
             // Handle switching to the new weapon index
-            SwitchToWeaponIndex(newWeaponIndex);
+            SwitchWeaponServerRpc(newWeaponIndex);
         }
 
         // Switches to the given weapon index in weapon slots if the new index is a valid weapon that is different from our current one
@@ -432,6 +455,8 @@ namespace Unity.FPS.Gameplay
         // Adds a weapon to our inventory
         public bool AddWeapon(WeaponController weaponPrefab)
         {
+            if (!IsServer) return false;
+
             // if we already hold this weapon type (a weapon coming from the same source prefab), don't add the weapon
             if (HasWeapon(weaponPrefab) != null)
             {
@@ -446,22 +471,10 @@ namespace Unity.FPS.Gameplay
                 {
                     // spawn the weapon prefab as child of the weapon socket
                     WeaponController weaponInstance = Instantiate(weaponPrefab, WeaponParentSocket);
-                    weaponInstance.transform.localPosition = Vector3.zero;
-                    weaponInstance.transform.localRotation = Quaternion.identity;
+                    var netObj = weaponInstance.GetComponent<NetworkObject>();
+                    netObj.SpawnWithOwnership(OwnerClientId);
 
-                    // Set owner to this gameObject so the weapon can alter projectile/damage logic accordingly
-                    weaponInstance.Owner = gameObject;
-                    weaponInstance.SourcePrefab = weaponPrefab.gameObject;
-                    weaponInstance.ShowWeapon(false);
-
-                    // Assign the first person layer to the weapon
-                    int layerIndex =
-                        Mathf.RoundToInt(Mathf.Log(FpsWeaponLayer.value,
-                            2)); // This function converts a layermask to a layer index
-                    foreach (Transform t in weaponInstance.gameObject.GetComponentsInChildren<Transform>(true))
-                    {
-                        t.gameObject.layer = layerIndex;
-                    }
+                    SetupWeaponOnClient(weaponInstance, i);
 
                     m_WeaponSlots[i] = weaponInstance;
 
@@ -481,6 +494,22 @@ namespace Unity.FPS.Gameplay
             }
 
             return false;
+        }
+        void SetupWeaponOnClient(WeaponController weaponInstance, int slotIndex)
+        {
+            weaponInstance.transform.localPosition = Vector3.zero;
+            weaponInstance.transform.localRotation = Quaternion.identity;
+
+            weaponInstance.Owner = gameObject;
+            weaponInstance.SourcePrefab = weaponInstance.gameObject;
+            weaponInstance.ShowWeapon(false);
+
+            // FPS Layer atama
+            int layerIndex = Mathf.RoundToInt(Mathf.Log(FpsWeaponLayer.value, 2));
+            foreach (Transform t in weaponInstance.gameObject.GetComponentsInChildren<Transform>(true))
+            {
+                t.gameObject.layer = layerIndex;
+            }
         }
 
         public bool RemoveWeapon(WeaponController weaponInstance)
@@ -562,16 +591,44 @@ namespace Unity.FPS.Gameplay
             }
         }
         [ServerRpc]
-        void SwitchWeaponServerRpc(int newIndex)
+        public void SwitchWeaponServerRpc(int newIndex)
         {
-            SwitchToWeaponIndex(newIndex, true);
+            if (!IsOwner) return;
+
+            ActiveWeaponIndex.Value = newIndex; // NetworkVariable güncelleniyor
+            PlayWeaponSwitchClientRpc(newIndex);
+        }
+
+        [ServerRpc]
+        void FireServerRpc()
+        {
+            var activeWeapon = GetActiveWeapon();
+            if (activeWeapon == null) return;
+
+            bool didFire = activeWeapon.ServerHandleFire(); // client değil, server işleyecek
+
+            if (didFire)
+            {
+                activeWeapon.PlayFireVFXClientRpc();
+            }
+        }
+        [ServerRpc]
+        void ReloadServerRpc()
+        {
+            var activeWeapon = GetActiveWeapon();
+            if (activeWeapon == null) return;
+
+            bool didStart = activeWeapon.ServerHandleReload();
+            if (didStart)
+            {
+                activeWeapon.PlayReloadVFXClientRpc(); // herkese reload efektini oynat
+            }
         }
 
         [ClientRpc]
         void PlayWeaponSwitchClientRpc(int newIndex)
         {
-            SwitchToWeaponIndex(newIndex, true);
+            SwitchToWeaponIndex(newIndex, true); // client'larda silah geçiş animasyonu
         }
-
     }
 }

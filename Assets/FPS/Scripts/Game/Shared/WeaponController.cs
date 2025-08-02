@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Unity.Netcode;
 
 namespace Unity.FPS.Game
 {
@@ -26,9 +27,10 @@ namespace Unity.FPS.Game
     }
 
     [RequireComponent(typeof(AudioSource))]
-    public class WeaponController : MonoBehaviour
+    public class WeaponController : NetworkBehaviour
     {
-        [Header("Information")] [Tooltip("The name that will be displayed in the UI for this weapon")]
+        [Header("Information")]
+        [Tooltip("The name that will be displayed in the UI for this weapon")]
         public string WeaponName;
 
         [Tooltip("The image that will be displayed in the UI for this weapon")]
@@ -47,7 +49,8 @@ namespace Unity.FPS.Game
         [Tooltip("Tip of the weapon, where the projectiles are shot")]
         public Transform WeaponMuzzle;
 
-        [Header("Shoot Parameters")] [Tooltip("The type of weapon wil affect how it shoots")]
+        [Header("Shoot Parameters")]
+        [Tooltip("The type of weapon wil affect how it shoots")]
         public WeaponShootType ShootType;
 
         [Tooltip("The projectile prefab")] public ProjectileBase ProjectilePrefab;
@@ -61,10 +64,12 @@ namespace Unity.FPS.Game
         [Tooltip("Amount of bullets per shot")]
         public int BulletsPerShot = 1;
 
-        [Tooltip("Force that will push back the weapon after each shot")] [Range(0f, 2f)]
+        [Tooltip("Force that will push back the weapon after each shot")]
+        [Range(0f, 2f)]
         public float RecoilForce = 1;
 
-        [Tooltip("Ratio of the default FOV that this weapon applies while aiming")] [Range(0f, 1f)]
+        [Tooltip("Ratio of the default FOV that this weapon applies while aiming")]
+        [Range(0f, 1f)]
         public float AimZoomRatio = 1f;
 
         [Tooltip("Translation to apply to weapon arm when aiming with this weapon")]
@@ -107,7 +112,7 @@ namespace Unity.FPS.Game
         [Tooltip("Additional ammo used when charge reaches its maximum")]
         public float AmmoUsageRateWhileCharging = 1f;
 
-        [Header("Audio & Visual")] 
+        [Header("Audio & Visual")]
         [Tooltip("Optional weapon animator for OnShoot animations")]
         public Animator WeaponAnimator;
 
@@ -157,6 +162,7 @@ namespace Unity.FPS.Game
 
         AudioSource m_ShootAudioSource;
 
+        float m_ReloadStartTime;
         public bool IsReloading { get; private set; }
 
         const string k_AnimAttackParameter = "Attack";
@@ -244,6 +250,12 @@ namespace Unity.FPS.Game
             {
                 MuzzleWorldVelocity = (WeaponMuzzle.position - m_LastMuzzlePosition) / Time.deltaTime;
                 m_LastMuzzlePosition = WeaponMuzzle.position;
+            }
+            
+            if (IsReloading && Time.time > m_ReloadStartTime + 1.0f) // reload süresi örnek: 1 saniye
+            {
+                m_CurrentAmmo = ClipSize;
+                IsReloading = false;
             }
         }
 
@@ -450,6 +462,9 @@ namespace Unity.FPS.Game
                 ProjectileBase newProjectile = Instantiate(ProjectilePrefab, WeaponMuzzle.position,
                     Quaternion.LookRotation(shotDirection));
                 newProjectile.Shoot(this);
+
+                var netObj = newProjectile.GetComponent<NetworkObject>();
+                netObj.Spawn();
             }
 
             // muzzle flash
@@ -497,6 +512,72 @@ namespace Unity.FPS.Game
                 spreadAngleRatio);
 
             return spreadWorldDirection;
+        }
+        public bool ServerHandleFire()
+        {
+            if (m_CurrentAmmo >= 1f && m_LastTimeShot + DelayBetweenShots < Time.time)
+            {
+                HandleShoot(); // zaten mevcut fonksiyon
+                m_CurrentAmmo -= 1f;
+                return true;
+            }
+
+            return false;
+        }
+        public bool ServerHandleReload()
+        {
+            if (m_CurrentAmmo < ClipSize && !IsReloading)
+            {
+                IsReloading = true;
+                m_ReloadStartTime = Time.time;
+                return true;
+            }
+
+            return false;
+        }
+        // Client'larda sadece VFX çalıştırmak için
+        [ClientRpc]
+        public void PlayFireVFXClientRpc()
+        {
+            // Muzzle flash
+            if (MuzzleFlashPrefab != null)
+            {
+                GameObject muzzleFlashInstance = Instantiate(MuzzleFlashPrefab, WeaponMuzzle.position,
+                    WeaponMuzzle.rotation, WeaponMuzzle.transform);
+
+                if (UnparentMuzzleFlash)
+                {
+                    muzzleFlashInstance.transform.SetParent(null);
+                }
+
+                Destroy(muzzleFlashInstance, 2f);
+            }
+
+            // Ses
+            if (ShootSfx && !UseContinuousShootSound)
+            {
+                m_ShootAudioSource.PlayOneShot(ShootSfx);
+            }
+
+            // Animasyon
+            if (WeaponAnimator)
+            {
+                WeaponAnimator.SetTrigger("Attack");
+            }
+        }
+        [ClientRpc]
+        public void PlayReloadVFXClientRpc()
+        {
+            if (WeaponAnimator)
+            {
+                WeaponAnimator.SetTrigger("Reload");
+            }
+
+            // Ses efekti (istersen)
+            if (ShootSfx)
+            {
+                m_ShootAudioSource.PlayOneShot(ShootSfx); // reload için özel ses varsa değiştir
+            }
         }
     }
 }
