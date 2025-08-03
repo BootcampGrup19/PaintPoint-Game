@@ -25,7 +25,7 @@ namespace Unity.FPS.Gameplay
                 valueArray[counter++] = kvp.Value;
             }
 
-            Debug.Log($"[PaintWinChecker] Toplam boyanma oraný: {totalPaintedPercent}%");
+            Debug.Log($"[PaintWinChecker] Toplam boyanma oranï¿½: {totalPaintedPercent}%");
 
             hasChecked = true;
             var flowManager = FindObjectOfType<Unity.FPS.Game.GameFlowManager>();
@@ -33,22 +33,22 @@ namespace Unity.FPS.Gameplay
 
             if (totalPaintedPercent >= winThresholdPercent)
             {
-                // GameFlowManager'a EndGame(true) çaðrýsý gönder
+                // GameFlowManager'a EndGame(true) ï¿½aï¿½rï¿½sï¿½ gï¿½nder
                 if (flowManager != null)
                 {
                     flowManager.EndGame(true);
 
-                    Debug.Log("[PaintWinChecker] Oyunu kazandýn!");
+                    Debug.Log("[PaintWinChecker] Oyunu kazandï¿½n!");
                 }
                 else
                 {
-                    Debug.LogWarning("GameFlowManager bulunamadý!");
+                    Debug.LogWarning("GameFlowManager bulunamadï¿½!");
                 }
             }
             else
             {
                 flowManager.EndGame(false);
-                Debug.Log("[PaintWinChecker] Kazanma þartlarý saðlanamadý.");
+                Debug.Log("[PaintWinChecker] Kazanma ï¿½artlarï¿½ saï¿½lanamadï¿½.");
             }
         }
     }
