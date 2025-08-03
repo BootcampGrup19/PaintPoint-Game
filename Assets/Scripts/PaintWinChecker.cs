@@ -6,15 +6,11 @@ namespace Unity.FPS.Gameplay
     {
         public Paintable paintable; // inspector'dan atanacak
         public float winThresholdPercent = 50f;
-        ResultManager resultManager;
-
         bool hasChecked = false;
 
-        private void Awake()
-        {
-            resultManager = FindFirstObjectByType<ResultManager>();
-        }
+        public float totalPaintedPercent = 0f;
 
+        public float [] valueArray = new float[4];
 
         public void CheckPaintWinCondition()
         {
@@ -22,10 +18,11 @@ namespace Unity.FPS.Gameplay
 
             var colorRatios = PaintManager.instance.CalculatePaintedPercentageByColor(paintable);
 
-            float totalPaintedPercent = 0f;
+            int counter = 0;
             foreach (var kvp in colorRatios)
             {
                 totalPaintedPercent += kvp.Value;
+                valueArray[counter++] = kvp.Value;
             }
 
             Debug.Log($"[PaintWinChecker] Toplam boyanma oraný: {totalPaintedPercent}%");
@@ -39,7 +36,6 @@ namespace Unity.FPS.Gameplay
                 // GameFlowManager'a EndGame(true) çaðrýsý gönder
                 if (flowManager != null)
                 {
-                    resultManager.SetResults(totalPaintedPercent, colorRatios["Red"], colorRatios["Blue"], colorRatios["Green"], colorRatios["Yellow"]);
                     flowManager.EndGame(true);
 
                     Debug.Log("[PaintWinChecker] Oyunu kazandýn!");
@@ -51,7 +47,6 @@ namespace Unity.FPS.Gameplay
             }
             else
             {
-                resultManager.SetResults(totalPaintedPercent, colorRatios["Red"], colorRatios["Blue"], colorRatios["Green"], colorRatios["Yellow"]);
                 flowManager.EndGame(false);
                 Debug.Log("[PaintWinChecker] Kazanma þartlarý saðlanamadý.");
             }

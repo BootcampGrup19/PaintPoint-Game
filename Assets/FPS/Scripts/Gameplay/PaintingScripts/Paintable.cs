@@ -52,19 +52,6 @@ namespace Unity.FPS.Gameplay
             supportTexture.Release();
         }
 
-        private void Update()
-        {
-            
-
-            if (Keyboard.current.hKey.wasPressedThisFrame)
-            {
-                var ratios = PaintManager.instance.CalculatePaintedPercentageByColor(this);
-                foreach (var kvp in ratios)
-                {
-                    Debug.Log($"{kvp.Key} ile boyanma oran�: {kvp.Value}%");
-                }
-            }
-        }
     }
 }
 
