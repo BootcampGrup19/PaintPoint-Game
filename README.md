@@ -11,12 +11,13 @@ Abdulkadir Güç
 ## Oyun İsmi
 PaintPoint
 ## Oyun Tanıtımı
-PaintPoint, çok oyunculu ve takım tabanlı, stratejik ve rekabetçi öğeler barındıran bir alan boyama oyunudur. Oyuncular, özel boya silahlarıyla donanmış karakterlerini kontrol ederek, harita üzerinde mümkün olduğunca fazla alanı kendi takımlarının rengine boyamaya çalışırlar. Bunu yaparken oyuncular, boya silahları ile rakipleri kısa bir süreliğine etkisiz hale getirebilir veya haritada çıkan "power up" lar ile birtakım özel güçleri kullanabilirler. Oyun süresi sonunda en çok alanı boyamış olan takım maçı kazanır.  
+PaintPoint, verilen sürede oyuncunun belirli bir alanı boyamaya çalıştığı ve aynı zamanda düşmanlarla savaştığı tek oyunculu fps oyunudur. Oyunda 3 farklı zorluk seviyesinde level bulunmaktadır. Oyuncu level içinde farklı silahları ve özellikleri toplayarak 1 dakika hayatta kalmalı ve üstünde durduğu platformu istediği renklerle boyamalıdır. Oyun web için üretilmiştir.
 ## Oyun Özellikleri
 1. Birinci şahıs kamera açısı (fps)
-2. 10 oyuncuya kadar çok oyunculu lobiler
-3. Farklı haritalar ile dinamik bir oyun deneyimi
-4. Silah ve power up çeşitliliği ile farklı stratejilerin geliştirilebileceği bir oynanış
+2. Farklı haritalar ile dinamik bir oyun deneyimi
+3. Silah ve power up çeşitliliği ile farklı stratejilerin geliştirilebileceği bir oynanış
+## Oynanış Videosu
+[YouTube Linki](https://www.youtube.com/watch?v=X2LoJgp3D8s)
 ## Backlog, Daily Scrum, User Story ve Sprint Board URL:  
 [Miro Board](https://miro.com/app/board/uXjVIluS4aA=/)
 # Sprint Kayıtları
@@ -72,5 +73,29 @@ PaintPoint, çok oyunculu ve takım tabanlı, stratejik ve rekabetçi öğeler b
   * Edinilen tecrübeler sonucu daha yapılabilir şeyler üzerine yoğunlaşılacak ve proje bu doğrultuda tamamlanacak.
   * Tüm ekip üyeleri kalan eğitimlerini tamamladığı için sonraki sprintte eğitimlerin tamamlanmasına vakit harcamayacaklar.
   * Motivasyonun sağlanması adına daha sık toplantı ve ortak çalışma yapılacak.
+
+ ## Sprint 3
+* Sprint Notları
+  * Bu sprintte işler hedeflendiği gibi gitmedi.
+  * Bu sprintte proje pivot etti.
+  * Projenin kapsamı daraltıldı ve yeni haliyle planlanıp tamamlandı.
+* Sprint içinde tamamlamlanması hedeflenen puan: 57
+* Sprint içinde ulaşılan puan: 27
+* Sprint Puan Mantığı: Fibonacci sayı dizisi ile zorluğuna göre puanlanmış toplam 100 puan değerindeki görevler 3 sprinte bölünmüştür. [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/Sprints.png)
+* Daily Scrum: Daily scrumlar Whatsapp üzerinden yapıldı. Son günlerde her gün her saat iletişimde kalındığı için daily scrum yapılmadı. [Ekran Görüntüleri](https://github.com/BootcampGrup19/PaintPoint-Game/tree/main/Assets/Images/ScrumImages/Sprint%203/DailyScrums)
+* Sprint Board Update [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/Sprint%203/Di%C4%9Fer/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-08-03%20183733.png) 
+* Oyun Hakkında Gelişmeler [Ekran Görüntüleri](https://github.com/BootcampGrup19/PaintPoint-Game/tree/main/Assets/Images/ScrumImages/Sprint%203/EkranG%C3%B6r%C3%BCnt%C3%BCleri)
+* Sprint Review
+ * Bu sprint stresli ve zorlu geçti.
+ * Teknik becerilerimizin çok üstünde bir proje hedeflendiği için proje önceki hedefleriyle başaryıla sonuçlanamadı.
+ * Projenin multiplayer kapsamı, yapılan onca sistem iptal edildi.
+ * Eldeki çalışan sistemler birleştirilerek içimize sinen bir oyun ortaya kondu.
+* Sprint Retrospecitve
+ * Scrum Master projede oluşan aksaklıkları iletişim yoluyla daha önceden tespit etmeliydi ve daha erken aksiyon alınmalıydı.
+ * Proje çok geç kalmadan pivot ederek bir neticeye ulaştı.
+ * Tüm ekip üyeleri çok değerli tecrübeler kazandı.
+## Projede Kullanılan Assetler ve Kaynaklar:
+* [https://github.com/mixandjam/Splatoon-Ink](https://github.com/mixandjam/Splatoon-Ink)
+* [https://learn.unity.com/project/fps-template](https://learn.unity.com/project/fps-template)
 
 
