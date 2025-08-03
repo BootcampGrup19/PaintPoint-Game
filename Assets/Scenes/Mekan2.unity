@@ -280,6 +280,14 @@ PrefabInstance:
       propertyPath: timerText
       value: 
       objectReference: {fileID: 139250272}
+    - target: {fileID: 3909928958298850829, guid: 3750d402974937145b40a5f3eb3b492b, type: 3}
+      propertyPath: paintable
+      value: 
+      objectReference: {fileID: 1236928401}
+    - target: {fileID: 3909928958298850829, guid: 3750d402974937145b40a5f3eb3b492b, type: 3}
+      propertyPath: winThresholdPercent
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4097300700539387900, guid: 3750d402974937145b40a5f3eb3b492b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 978.7692
@@ -6850,6 +6858,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1240666088016043041, guid: 13711f9f4dfc7e84b82dcbce51f26357, type: 3}
+      propertyPath: m_text
+      value: 1:00
+      objectReference: {fileID: 0}
     - target: {fileID: 2694006666458380880, guid: 13711f9f4dfc7e84b82dcbce51f26357, type: 3}
       propertyPath: m_Name
       value: HUDCanvas

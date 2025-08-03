@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4097300700539387900}
   - component: {fileID: 3127056054763829559}
+  - component: {fileID: 3909928958298850829}
   m_Layer: 0
   m_Name: GM
   m_TagString: Untagged
@@ -46,5 +47,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timerText: {fileID: 0}
   countTxt: {fileID: 0}
-  remainingTime: 90
+  remainingTime: 60
   countImgs: {fileID: 0}
+--- !u!114 &3909928958298850829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 292382503702531150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f96e7623b2c10544181d1787f4dc78d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  paintable: {fileID: 0}
+  winThresholdPercent: 15

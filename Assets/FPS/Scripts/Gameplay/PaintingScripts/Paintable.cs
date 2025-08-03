@@ -54,15 +54,7 @@ namespace Unity.FPS.Gameplay
 
         private void Update()
         {
-            if (Keyboard.current.gKey.wasPressedThisFrame)
-            {
-                if (!gameObject.activeInHierarchy)
-                    return;
-
-                float percent = PaintManager.instance.CalculatePaintedPercentage(this);
-                Debug.Log("Boyanma Oran�: " + percent + "%");
-
-            }
+            
 
             if (Keyboard.current.hKey.wasPressedThisFrame)
             {

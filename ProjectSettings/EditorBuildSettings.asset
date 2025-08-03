@@ -17,6 +17,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Mekan3.unity
     guid: 46521d246460e9f4c82c944eef848595
+  - enabled: 1
+    path: Assets/Scenes/LoseScene.unity
+    guid: 65c0d650c91b13d4abb54a1247f1d7e0
+  - enabled: 1
+    path: Assets/Scenes/WinScene.unity
+    guid: 4104437c672f6204bbb9df85fc057aaa
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

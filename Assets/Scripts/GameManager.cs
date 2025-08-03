@@ -9,7 +9,7 @@ namespace Unity.BizimKodlar
     public class GameManager : MonoBehaviour
     {
         public TextMeshProUGUI timerText, countTxt; // UI'daki TMP Text referans�
-        public float remainingTime = 90f; // 1:30 -> 90 saniye
+        public float remainingTime = 60f; // 1:30 -> 90 saniye
 
         private bool timerRunning = false;
 
@@ -18,9 +18,12 @@ namespace Unity.BizimKodlar
 
         private PlayerInputHandler playerInputHandler;
 
+        private PaintWinChecker paintWinChecker;
+
 
         private void Start()
         {
+            paintWinChecker = FindFirstObjectByType<PaintWinChecker>();
             playerInputHandler = FindFirstObjectByType<PlayerInputHandler>();
 
 
@@ -93,6 +96,7 @@ namespace Unity.BizimKodlar
                 timerRunning = false;
                 UpdateTimerDisplay(0);
                 TimerFinished();
+                paintWinChecker.CheckPaintWinCondition();
             }
         }
 
