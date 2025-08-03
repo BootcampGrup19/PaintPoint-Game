@@ -83,7 +83,7 @@ PaintPoint, verilen sürede oyuncunun belirli bir alanı boyamaya çalıştığ�
 * Sprint içinde ulaşılan puan: 27
 * Sprint Puan Mantığı: Fibonacci sayı dizisi ile zorluğuna göre puanlanmış toplam 100 puan değerindeki görevler 3 sprinte bölünmüştür. [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/Sprints.png)
 * Daily Scrum: Daily scrumlar Whatsapp üzerinden yapıldı. Son günlerde her gün her saat iletişimde kalındığı için daily scrum yapılmadı. [Ekran Görüntüleri](https://github.com/BootcampGrup19/PaintPoint-Game/tree/main/Assets/Images/ScrumImages/Sprint%203/DailyScrums)
-* Sprint Board Update [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/Sprint%203/Di%C4%9Fer/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-08-03%20183733.png) 
+* Sprint Board Update [Ekran Görüntüsü](https://github.com/BootcampGrup19/PaintPoint-Game/blob/main/Assets/Images/ScrumImages/Sprint%203/Di%C4%9Fer/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-08-03%20212341.png) 
 * Oyun Hakkında Gelişmeler [Ekran Görüntüleri](https://github.com/BootcampGrup19/PaintPoint-Game/tree/main/Assets/Images/ScrumImages/Sprint%203/EkranG%C3%B6r%C3%BCnt%C3%BCleri)
 * Sprint Review
  * Bu sprint stresli ve zorlu geçti.
